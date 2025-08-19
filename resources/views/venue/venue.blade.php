@@ -8,7 +8,7 @@
             <link rel="apple-touch-icon" sizes="100x100" href="../assets/img/apple-icon.png">
             <link rel="icon" type="image/png" href="{{asset('img/logo.png')}}">
                 <title>Venue</title>
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
         </head>
         <body>
             @include('layouts.navbar')
@@ -26,6 +26,31 @@
     </div>
     @include('layouts.filter2')
     <div id="venue-container" class="venue-container">
+        @php
+        // Pakai data yang ada: $menus atau $fnbMenus
+        $list = isset($venues) ? $venues : ($venues ?? collect());
+    @endphp
+
+    @forelse($list as $venue)
+        <div class="menu-card">
+            <div class="venue-image">
+                <img
+                    src="{{ $venue->image ? asset('storage/' . $venue->image) : asset('images/default.jpg') }}"
+                    alt="{{ $venue->name }}"
+                >
+            </div>
+            <div class="venue-content">
+                <h3 class="menu-title">{{ $venue->name }}</h3>
+                <p class="menu-price">
+                    Rp{{ is_numeric($venue->price) ? number_format($venue->price, 2, ',', '.') : $venue->price }}
+                </p>
+                <p class="menu-desc">{{ $venue->description }}</p>
+                <a href="#" class="order-btn">Pesan Sekarang</a>
+            </div>
+        </div>
+    @empty
+        <p>Tidak ada menu.</p>
+    @endforelse
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -69,7 +94,7 @@ $(document).ready(function () {
                                     <h3>${venue.name}</h3>
                                     <p>${venue.city ? venue.city.name : '-'}</p>
                                     <p>${venue.category ? venue.category.name : '-'}</p>
-                                    <p>Rp ${venue.price ?? '-'}</p>
+                                    <p class="menu-price">Rp ${venue.price}</p>
                                     <a href="/wow/${venue.id}" class="order-btn">Lihat Detail</a>
                                 </div>
                             </div>

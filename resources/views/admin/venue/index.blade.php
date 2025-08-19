@@ -99,7 +99,7 @@
             </td>
             <td class="text-sm text-center">{{ $venue->name ?? 'N/A' }}</td>
             <td class="text-sm text-center">{{ $venue->address ?? 'N/A' }}</td>
-            <td class="text-sm text-center">Rp {{ $venue->price }}</td>
+            <td class="text-sm text-center">Rp {{ number_format($venue->price, 2, ',', '.') }}</td>
             <td class="text-sm text-center">
                 <a href="{{ route('admin.venues.edit', $venue->id) }}" class="btn btn-sm btn-warning">Edit</a>
                 <form action="{{ route('admin.venues.destroy', $venue->id) }}" method="POST" style="display:inline-block">

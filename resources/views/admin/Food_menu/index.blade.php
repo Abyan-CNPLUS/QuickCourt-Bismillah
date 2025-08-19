@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>FNB</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="apple-touch-icon" sizes="100x100" href="../assets/img/apple-icon.png">
+            <link rel="icon" type="image/png" href="{{asset('img/logo.png')}}">
+                <title>FNB</title>
 </head>
 <body>
 <!DOCTYPE html>
@@ -12,11 +15,6 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="{{asset('img/logo.png')}}">
-    <title>
-        QuickCourt
-    </title>
     <!--Fonts and icons-->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
     <!-- Nucleo Icons -->

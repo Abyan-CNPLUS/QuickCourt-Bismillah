@@ -5,7 +5,10 @@
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <meta http-equiv="X-UA-Compatible" content="ie=edge">
           <link rel="stylesheet" href="{{asset('css/style.css')}}">
-          <title>Document</title> <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+            <link rel="apple-touch-icon" sizes="100x100" href="../assets/img/apple-icon.png">
+            <link rel="icon" type="image/png" href="{{asset('img/logo.png')}}">
+                <title>Venue</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
         </head>
         <body>
             @include('layouts.navbar')

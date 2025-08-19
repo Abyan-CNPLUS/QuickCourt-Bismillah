@@ -1,0 +1,243 @@
+<style>
+    body {
+  font-family: "Oxygen", sans-serif;
+  color: #050505;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cards_item {
+  display: flex;
+  padding: 1rem;
+}
+
+.card_image {
+  position: relative;
+  max-height: 250px;
+}
+
+.card_image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card_price {
+  position: absolute;
+  /* bottom: 8px; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 195px;
+  height: 45px;
+  border-radius: 8px;
+  background-color: #0066cc;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.card_price span {
+  font-size: 12px;
+  margin-top: -2px;
+}
+
+.note {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 8px;
+  border-radius: 0.25rem;
+  background-color: #c89b3f;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+@media (min-width: 40rem) {
+  .cards_item {
+    width: 50%;
+  }
+}
+
+@media (min-width: 56rem) {
+  .cards_item {
+    width: 33.3333%;
+  }
+}
+
+.card {
+  background-color: white;
+  /* border-radius: 0.25rem; */
+  /* box-shadow: 0 20px 40px -14px rgba(0, 0, 0, 0.25); */
+  display: flex;
+  width: 250px;
+  border: #050505 1px solid;
+  height: 250px;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.card_content {
+  position: relative;
+  padding: 16px 12px 32px 24px;
+  margin: 16px 8px 8px 0;
+  max-height: 290px;
+}
+
+.card_content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card_content::-webkit-scrollbar-track {
+  /* box-shadow: 0; */
+  border-radius: 0;
+}
+
+.card_content::-webkit-scrollbar-thumb {
+  background: #c89b3f;
+  border-radius: 15px;
+}
+
+.card_title {
+  position: relative;
+  margin: 0 0 24px;
+  padding-bottom: 10px;
+  text-align: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.card_title::after {
+  position: absolute;
+  display: block;
+  width: 50px;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #c89b3f;
+  content: "";
+}
+li.cards_item {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+</style>
+
+<div class="main">
+  <ul class="cards">
+    <li class="cards_item">
+      <div class="card">
+        <div class="card_image">
+           <img src="{{asset('img/telur.png')}}" alt="Header Image" class="header-image" style="width: 50%; height:50% align-items: center; margin-left: 25%; margin-top: 10px">
+        </div>
+        <div class="card_content">
+          <h2 class="card_title">Farmstand Salad</h2>
+           <span class="card_price"><span>RP</span>9</span>
+        </div>
+      </div>
+    </li>
+
+  <li class="cards_item">
+      <div class="card">
+        <div class="card_image">
+           <img src="{{asset('img/telur.png')}}" alt="Header Image" class="header-image" style="width: 50%; height:50% align-items: center; margin-left: 25%; margin-top: 10px">
+        </div>
+        <div class="card_content">
+          <h2 class="card_title">Farmstand Salad</h2>
+           <span class="card_price"><span>RP</span>9</span>
+        </div>
+      </div>
+    </li>
+
+    <li class="cards_item">
+      <div class="card">
+        <div class="card_image">
+           <img src="{{asset('img/telur.png')}}" alt="Header Image" class="header-image" style="width: 50%; height:50% align-items: center; margin-left: 25%; margin-top: 10px">
+        </div>
+        <div class="card_content">
+          <h2 class="card_title">Farmstand Salad</h2>
+           <span class="card_price"><span>RP</span>9</span>
+        </div>
+      </div>
+    </li>
+
+    <li class="cards_item">
+      <div class="card">
+        <div class="card_image">
+           <img src="{{asset('img/telur.png')}}" alt="Header Image" class="header-image" style="width: 50%; height:50% align-items: center; margin-left: 25%; margin-top: 10px">
+        </div>
+        <div class="card_content">
+          <h2 class="card_title">Farmstand Salad</h2>
+           <span class="card_price"><span>RP.</span>9.000</span>
+        </div>
+      </div>
+    </li>
+
+     <li class="cards_item">
+      <div class="card">
+        <div class="card_image">
+           <img src="{{asset('img/telur.png')}}" alt="Header Image" class="header-image" style="width: 50%; height:50% align-items: center; margin-left: 25%; margin-top: 10px">
+        </div>
+        <div class="card_content">
+          <h2 class="card_title">Farmstand Salad</h2>
+           <span class="card_price"><span>RP.</span>9.000</span>
+        </div>
+      </div>
+    </li>
+
+   <li class="cards_item">
+      <div class="card">
+        <div class="card_image">
+           <img src="{{asset('img/telur.png')}}" alt="Header Image" class="header-image" style="width: 50%; height:50% align-items: center; margin-left: 25%; margin-top: 10px">
+        </div>
+        <div class="card_content">
+          <h2 class="card_title">Farmstand Salad</h2>
+           <span class="card_price"><span>RP.</span>9.000</span>
+        </div>
+      </div>
+    </li>
+
+    <li class="cards_item">
+      <div class="card">
+        <div class="card_image">
+           <img src="{{asset('img/telur.png')}}" alt="Header Image" class="header-image" style="width: 50%; height:50% align-items: center; margin-left: 25%; margin-top: 10px">
+        </div>
+        <div class="card_content">
+          <h2 class="card_title">Farmstand Salad</h2>
+           <span class="card_price"><span>RP.</span>9.000</span>
+        </div>
+      </div>
+    </li>
+
+    <li class="cards_item">
+      <div class="card">
+        <div class="card_image">
+           <img src="{{asset('img/telur.png')}}" alt="Header Image" class="header-image" style="width: 50%; height:50% align-items: center; margin-left: 25%; margin-top: 10px">
+        </div>
+        <div class="card_content">
+          <h2 class="card_title">Farmstand Salad</h2>
+           <span class="card_price"><span>RP.</span>9.000</span>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>

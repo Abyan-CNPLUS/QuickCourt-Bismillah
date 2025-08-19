@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\User;
-use App\Models\VenueImage;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,12 +14,28 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-       
+        // User::factory(10)->create();
 
-        $this->call([
-            VenueSeeder::class,
-            VenueImageSeeder::class,
+        User::updateOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('password'),
+                'phone' => '1234567890',
+                'email_verified_at' => now(),
+                'role' => 'admin'
+            ]
+        );
 
-        ]);
+        User::updateOrCreate(
+            ['email' => 'abi@gmail.com'],
+            [
+                'name' => 'Mas Ndronk',
+                'password' => Hash::make('123456'),
+                'phone' => '1234567890',
+                'email_verified_at' => now(),
+                'role' => 'user'
+            ]
+        );
     }
 }

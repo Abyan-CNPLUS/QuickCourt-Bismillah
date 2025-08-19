@@ -1,0 +1,114 @@
+.page-item {
+  &.active .page-link {
+    box-shadow: $pagination-active-box-shadow;
+  }
+
+  .page-link,
+  span {
+    display: $page-link-display;
+    align-items: $page-link-align-items;
+    justify-content: $page-link-justify-content;
+    color: $secondary;
+    padding: 0;
+    margin: $page-link-margin;
+    border-radius: $page-link-radius !important;
+    width: $page-link-width;
+    height: $page-link-height;
+    font-size: $font-size-sm;
+  }
+}
+.pagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+    border-radius: 0.375rem;
+    justify-content: center;
+    margin: 1rem 0;
+
+    .page-item {
+        margin: 0 0.15rem;
+
+        &.active .page-link {
+            background-color: #5e72e4;
+            border-color: #5e72e4;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        &.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+        }
+
+        .page-link {
+            position: relative;
+            display: block;
+            padding: 0.375rem 0.75rem;
+            margin-left: -1px;
+            line-height: 1.25;
+            color: #5e72e4;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+
+            &:hover {
+                z-index: 2;
+                color: #3a4ab1;
+                text-decoration: none;
+                background-color: #f8f9fa;
+                border-color: #dee2e6;
+            }
+
+            &:focus {
+                z-index: 3;
+                outline: 0;
+                box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.25);
+            }
+        }
+    }
+}
+
+.pagination-info {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.pagination-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 1rem;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .pagination-wrapper {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .pagination-info {
+        text-align: center;
+    }
+}
+
+
+// Colors
+.pagination {
+  @each $name, $value in $theme-gradient-colors {
+    &.pagination-#{$name} {
+      .page-item.active > .page-link {
+        &,
+        &:focus,
+        &:hover {
+          @include gradient-directional(nth($value, 1) 0%, nth($value, -1) 100%, $deg: 310deg);
+          border: none;
+        }
+      }
+    }
+  }
+}

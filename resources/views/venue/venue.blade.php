@@ -42,7 +42,7 @@
             <div class="venue-content">
                 <h3 class="menu-title">{{ $venue->name }}</h3>
                 <p class="menu-price">
-                    Rp{{ is_numeric($venue->price) ? number_format($venue->price, 2, ',', '.') : $venue->price }}
+                    Rp {{ number_format($venue->price, 0, ',', '.') }}
                 </p>
                 <p class="menu-desc">{{ $venue->description }}</p>
                 <a href="#" class="order-btn">Pesan Sekarang</a>
@@ -61,55 +61,61 @@ $(document).ready(function () {
     $('#city_id, #category_id').on('change', function () {
         loadVenues();
     });
+function formatRupiah(angka) {
+    return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
 
     function loadVenues() {
-        let cityId = $('#city_id').val();
-        let categoryId = $('#category_id').val();
+    let cityId = $('#city_id').val();
+    let categoryId = $('#category_id').val();
 
-        $.ajax({
-            url: "{{ route('venues.filter') }}",
-            method: "GET",
-            data: {
-                city_id: cityId,
-                category_id: categoryId
-            },
-            success: function (data) {
-                let html = '';
+    $.ajax({
+        url: "{{ route('venues.filter') }}",
+        method: "GET",
+        data: {
+            city_id: cityId,
+            category_id: categoryId
+        },
+        success: function (data) {
+            let html = '';
 
-                if (!Array.isArray(data) || data.length === 0) {
-                    html = `<p>Tidak ada venue sesuai filter.</p>`;
-                } else {
-                    data.forEach(function (venue) {
-                        // ambil gambar pertama kalau ada
-                        let img = venue.images.length > 0
-                            ? '/storage/' + venue.images[0].image_url
-                            : '/images/default.jpg';
+            if (!Array.isArray(data) || data.length === 0) {
+                html = `<p>Tidak ada venue sesuai filter.</p>`;
+            } else {
+                data.forEach(function (venue) {
+                    let img = venue.images.length > 0
+                        ? '/storage/' + venue.images[0].image_url
+                        : '/images/default.jpg';
 
-                        html += `
-                            <div class="venue-card">
-                                <div class="venue-image">
-                                    <img src="${img}" alt="${venue.name}" width="150">
-                                </div>
-                                <div class="venue-content">
-                                    <h3>${venue.name}</h3>
-                                    <p>${venue.city ? venue.city.name : '-'}</p>
-                                    <p>${venue.category ? venue.category.name : '-'}</p>
-                                    <p class="menu-price">Rp ${venue.price}</p>
-                                    <a href="/wow/${venue.id}" class="order-btn">Lihat Detail</a>
-                                </div>
+                    // 👉 letakkan di sini
+                    let showUrl = "{{ route('lapangan.show', ':id') }}";
+                    showUrl = showUrl.replace(':id', venue.id);
+
+                    html += `
+                        <div class="venue-card">
+                            <div class="venue-image">
+                                <img src="${img}" alt="${venue.name}" width="150">
                             </div>
-                        `;
-                    });
-                }
-
-                $('#venue-container').html(html);
-            },
-            error: function(xhr) {
-                console.error(xhr.responseText);
-                $('#venue-container').html(`<p style="color:red;">Terjadi kesalahan memuat venue.</p>`);
+                            <div class="venue-content">
+                                <h3>${venue.name}</h3>
+                                <p>${venue.city ? venue.city.name : '-'}</p>
+                                <p>${venue.category ? venue.category.name : '-'}</p>
+                                <p class="menu-price">${formatRupiah(venue.price)}</p>
+                                <a href="${showUrl}" class="order-btn">Lihat Detail</a>
+                            </div>
+                        </div>
+                    `;
+                });
             }
-        });
-    }
+
+            $('#venue-container').html(html);
+        },
+        error: function(xhr) {
+            console.error(xhr.responseText);
+            $('#venue-container').html(`<p style="color:red;">Terjadi kesalahan memuat venue.</p>`);
+        }
+    });
+}
 });
 </script>
 </body>

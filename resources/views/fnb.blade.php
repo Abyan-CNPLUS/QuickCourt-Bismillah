@@ -8,8 +8,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="apple-touch-icon" sizes="100x100" href="../assets/img/apple-icon.png">
-            <link rel="icon" type="image/png" href="{{asset('img/logo.png')}}">
-                <title>FNB</title>
+    <link rel="icon" type="image/png" href="{{asset('img/logo.png')}}">
+                <title>Pesan makanan terbaik anda</title>
 </head>
 <body>
     @include('layouts.navbar')
@@ -55,7 +55,7 @@
             <div class="venue-content">
                 <h3 class="menu-title">{{ $menu->name }}</h3>
                 <p class="menu-price">
-                    Rp{{ is_numeric($menu->price) ? number_format($menu->price, 2, ',', '.') : $menu->price }}
+                    Rp {{ number_format($menu->price, 0, ',', '.') }}
                 </p>
                 <p class="menu-desc">{{ $menu->description }}</p>
                 <a href="#" class="order-btn">Pesan Sekarang</a>

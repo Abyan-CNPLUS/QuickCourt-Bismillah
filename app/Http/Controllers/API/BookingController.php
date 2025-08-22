@@ -2,40 +2,30 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Controller;
 use App\Models\Venues;
 use App\Models\Booking;
-use App\Helpers\FcmHelper;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use App\Helpers\FcmNotification;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-
 
 class BookingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $bookings = Booking::where('user_id', Auth::id())->with('venue')->latest()->get();
-
-        return response()->json([
-            'message' => 'List of bookings',
-            'data' => $bookings,
-        ]);
+        return view('booking', compact('bookings'));
     }
 
+    public function create()
+    {
+        $venues = Venues::all();
+        return view('booking', compact('venues'));
+    }
 
     public function store(Request $request)
     {
-        $user = Auth::user();
-
         if (auth()->user()->role === 'guest') {
-            return response()->json([
-                'message' => 'Guest users are not allowed to make bookings.'
-            ], 403);
+            return redirect()->back()->with('error', 'Guest users are not allowed to make bookings.');
         }
 
         $request->validate([
@@ -47,19 +37,13 @@ class BookingController extends Controller
             'total_price' => 'required|numeric',
         ]);
 
-
         $venue = Venues::findOrFail($request->venue_id);
 
-
-        if (
-            $request->start_time < $venue->open_time || $request->end_time > $venue->close_time
-        ) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Booking time must be within venue operating hours (' . $venue->open_time . ' - ' . $venue->close_time . ')',
-            ], 422);
+        if ($request->start_time < $venue->open_time || $request->end_time > $venue->close_time) {
+            return redirect()->back()->withErrors([
+                'time' => 'Booking time must be within venue operating hours (' . $venue->open_time . ' - ' . $venue->close_time . ')',
+            ])->withInput();
         }
-
 
         $isBooked = Booking::where('venue_id', $request->venue_id)
             ->whereDate('booking_date', $request->booking_date)
@@ -67,21 +51,18 @@ class BookingController extends Controller
             ->where(function ($query) use ($request) {
                 $query->where(function ($q) use ($request) {
                     $q->where('start_time', '<', $request->end_time)
-                        ->where('end_time', '>', $request->start_time);
+                      ->where('end_time', '>', $request->start_time);
                 });
-            })
-            ->exists();
+            })->exists();
 
         if ($isBooked) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Venue is already booked in this time',
-            ], 409);
+            return redirect()->back()->withErrors([
+                'booking' => 'Venue is already booked in this time',
+            ])->withInput();
         }
 
-
         $booking = Booking::create([
-            'user_id' => $user->id,
+            'user_id' => Auth::id(),
             'venue_id' => $request->venue_id,
             'contact_number' => $request->contact_number,
             'booking_date' => $request->booking_date,
@@ -91,100 +72,30 @@ class BookingController extends Controller
             'status' => 'pending',
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Booking successfully',
-            'data' => $booking,
-        ], 201);
-
-        // $fcmToken = $user->fcm_token;
-        // $title = 'Booking Berhasil';
-        // $body = 'Booking kamu di ' . $venue->name . ' sudah dikonfirmasi.';
-
-        // $fcm = new FcmHelper();
-        // $fcm->sendNotification($fcmToken, $title, $body);
-
+        return redirect()->route('booking.show', $booking->id)->with('success', 'Booking successfully created!');
     }
 
-
-
-    public function show(string $id)
+    public function show($id)
     {
         $booking = Booking::with('venue')->find($id);
 
         if (!$booking || $booking->user_id != Auth::id()) {
-            return response()->json(['message' => 'Booking not found'], 404);
+            abort(404, 'Booking not found');
         }
 
-        return response()->json([
-            'message' => 'Detail booking',
-            'data' => $booking,
-        ]);
+        return view('booking.show', compact('booking'));
     }
 
-
-    public function update(Request $request, string $id)
-    {
-        $booking = Booking::find($id);
-
-        if (!$booking) {
-            return response()->json(['message' => 'Booking not found'], 404);
-        }
-
-        $request->validate([
-            'status' => 'required|in:pending,confirmed,cancelled,completed',
-        ]);
-
-
-        if ($request->status === 'cancelled') {
-            if ($booking->user_id !== Auth::id()) {
-                return response()->json(['message' => 'Unauthorized'], 403);
-            }
-        } elseif (!Auth::user()->is_admin) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
-
-        $booking->update(['status' => $request->status]);
-
-        return response()->json([
-            'message' => 'Status already updated',
-            'data' => $booking,
-        ]);
-    }
-
-
-    public function destroy(string $id)
+    public function destroy($id)
     {
         $booking = Booking::find($id);
 
         if (!$booking || $booking->user_id != Auth::id()) {
-            return response()->json(['message' => 'Booking not found'], 404);
+            abort(404, 'Booking not found');
         }
 
         $booking->delete();
 
-        return response()->json([
-            'message' => 'Booking deleted'
-        ]);
+        return redirect()->route('booking.index')->with('success', 'Booking deleted');
     }
-
-    public function checkAvailability(Request $request)
-    {
-        $request->validate([
-            'venue_id' => 'required|exists:venues,id',
-            'booking_date' => 'required|date',
-        ]);
-
-        $bookedSlots = Booking::where('venue_id', $request->venue_id)
-            ->whereDate('booking_date', $request->booking_date)
-            ->where('status', '!=', 'cancelled')
-            ->get(['start_time', 'end_time']);
-
-        return response()->json([
-            'message' => 'Booked time slots',
-            'data' => $bookedSlots,
-        ]);
-    }
-
-
 }

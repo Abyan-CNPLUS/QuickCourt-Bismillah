@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Booking extends Model
 {
     use HasFactory;
+
     protected $table = 'bookings';
     protected $primaryKey = 'id';
+
     protected $fillable = [
         'user_id',
         'venue_id',
@@ -22,9 +24,9 @@ class Booking extends Model
     ];
 
     protected $casts = [
-    'booking_date' => 'date',
-    'start_time' => 'datetime:H:i',
-    'end_time' => 'datetime:H:i',
+        'booking_date' => 'date',   // hanya tanggal
+        'start_time' => 'string',   // simpan sebagai string HH:MM:SS
+        'end_time' => 'string',
     ];
 
     public function user()
@@ -34,6 +36,11 @@ class Booking extends Model
 
     public function venue()
     {
-        return $this->belongsTo(Venues::class);
+        return $this->belongsTo(Venues::class); // pastikan modelnya "Venue" bukan "Venues"
+    }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
     }
 }

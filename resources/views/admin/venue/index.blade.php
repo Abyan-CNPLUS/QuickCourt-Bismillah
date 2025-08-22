@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Venue</title>
+    <link rel="apple-touch-icon" sizes="100x100" href="../assets/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="{{asset('img/logo.png')}}">
+    <title>
+        Venue
+    </title>
 </head>
 <body>
 <!DOCTYPE html>
@@ -13,10 +17,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="{{asset('img/logo.png')}}">
-    <title>
-        kinoko
-    </title>
+
     <!--Fonts and icons-->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
     <!-- Nucleo Icons -->
@@ -99,7 +100,7 @@
             </td>
             <td class="text-sm text-center">{{ $venue->name ?? 'N/A' }}</td>
             <td class="text-sm text-center">{{ $venue->address ?? 'N/A' }}</td>
-            <td class="text-sm text-center">Rp {{ number_format($venue->price, 2, ',', '.') }}</td>
+            <td class="text-sm text-center">Rp {{ number_format($venue->price, 0, ',', '.') }}</td>
             <td class="text-sm text-center">
                 <a href="{{ route('admin.venues.edit', $venue->id) }}" class="btn btn-sm btn-warning">Edit</a>
                 <form action="{{ route('admin.venues.destroy', $venue->id) }}" method="POST" style="display:inline-block">

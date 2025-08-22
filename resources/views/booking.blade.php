@@ -3,177 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Lapangan</title>
-    <style>
-        .booking-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        .title {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-        }
-
-        .section-title {
-            color: #3498db;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        .date-grid, .time-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .date-form {
-            margin: 0;
-        }
-
-        .date-option {
-            width: 100%;
-            padding: 15px 10px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .date-option:hover {
-            background: #f8f9fa;
-            border-color: #3498db;
-        }
-
-        .day {
-            display: block;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .date {
-            display: block;
-            color: #7f8c8d;
-        }
-
-        .time-option {
-            position: relative;
-        }
-
-        .time-label {
-            display: block;
-            padding: 12px 10px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .time-option input[type="radio"] {
-            position: absolute;
-            opacity: 0;
-        }
-
-        .time-option input[type="radio"]:checked + .time-label {
-            background: #3498db;
-            color: white;
-            border-color: #3498db;
-        }
-
-        .time-option input[type="radio"]:focus + .time-label {
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
-        }
-
-        .book-button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background: #2ecc71;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            margin-top: 20px;
-        }
-
-        .book-button:hover {
-            background: #27ae60;
-        }
-
-        .book-button i {
-            margin-right: 8px;
-        }
-    </style>
+    <title>Booking - {{ $venue->name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<div class="container my-4">
 
-    <div class="booking-container">
-        <h1 class="title">Pilih Jadwal Booking</h1>
+    {{-- Header Venue --}}
+    <div class="card shadow mb-4">
+        <img src="{{ $venue->image ? asset('storage/' . $venue->image) : 'https://via.placeholder.com/1200x400' }}"
+             class="card-img-top"
+             alt="{{ $venue->name }}">
+        <div class="card-body">
+            <h3 class="card-title mb-0">{{ $venue->name }}</h3>
+            <p class="text-muted">{{ $venue->city->name ?? '-' }}</p>
+        </div>
+    </div>
 
-        <!-- Tanggal -->
-        <div class="dates-container">
-            <h3 class="section-title">Pilih Tanggal</h3>
-            <div class="date-grid">
-                @foreach ($date as $dates)
-                    <form action="" method="GET" class="date-form">
-                        <input type="hidden" name="date" value="{{ $dates->id }}">
-                        <button type="submit" class="date-option">
-                            <span class="day">{{ \Carbon\Carbon::parse($dates->Tanggal)->isoFormat('dddd') }}</span>
-                            <span class="date">{{ \Carbon\Carbon::parse($dates->Tanggal)->isoFormat('D MMM') }}</span>
-                        </button>
-                    </form>
-                @endforeach
+    {{-- Pilih Tanggal --}}
+    <h5 class="mb-2">Pilih Tanggal</h5>
+    <div class="d-flex overflow-auto mb-4">
+        @foreach ($dates as $date)
+            <button type="button"
+                    class="btn btn-outline-primary me-2 {{ $loop->first ? 'active' : '' }}"
+                    data-date="{{ $date->format('Y-m-d') }}">
+                {{ $date->translatedFormat('D, d M') }}
+            </button>
+        @endforeach
+    </div>
+
+    {{-- Pilih Jam --}}
+    <h5 class="mb-2">Pilih Jam</h5>
+    <div class="row g-2 mb-4">
+        @foreach ($times as $time)
+            <div class="col-3">
+                <button type="button"
+                        class="btn w-100 {{ in_array($time, $bookedTimes) ? 'btn-secondary disabled' : 'btn-outline-success' }}"
+                        data-time="{{ $time }}"
+                        {{ in_array($time, $bookedTimes) ? 'disabled' : '' }}>
+                    {{ $time }}
+                </button>
             </div>
-        </div>
+        @endforeach
+    </div>
 
-        <!-- Waktu -->
-        <div class="times-container">
+   <form action="{{ route('bookings.store') }}" method="POST">
     @csrf
+    <input type="hidden" name="venue_id" value="{{ $venue->id }}">
+    <input type="hidden" name="booking_date" id="input-date" value="{{ $dates->first()->format('Y-m-d') }}">
+    <input type="hidden" name="start_time" id="input-time">
+    <input type="hidden" name="end_time" id="input-end-time">
+    <input type="hidden" name="total_price" id="input-total-price">
 
-    <!-- Nama & Email -->
-    <div style="margin-bottom: 20px;">
-        <label>Nama:</label>
-        <input type="text" name="customer_name" required style="width: 100%; padding: 10px;">
-    </div>
+    <div class="card p-3">
+        <h5>Ringkasan Pemesanan</h5>
+        <p><strong>Tanggal:</strong> <span id="summary-date">{{ $dates->first()->translatedFormat('D, d M') }}</span></p>
+        <p><strong>Jam:</strong> <span id="summary-time">-</span></p>
+        <p><strong>Harga:</strong> <span id="summary-price" data-price="{{ $venue->price }}">Rp {{ number_format($venue->price,0,',','.') }}</span></p>
 
-    <div style="margin-bottom: 20px;">
-        <label>Email:</label>
-        <input type="email" name="customer_email" required style="width: 100%; padding: 10px;">
-    </div>
-
-
-    <!-- Tanggal (ambil dari request GET) -->
-    <input type="hidden" name="booking_date" value="{{ request('date') ? \App\Models\dateplay::find(request('date'))->Tanggal : '' }}">
-
-    <!-- Waktu tersedia -->
-    <div class="time-grid">
-    @foreach ($times as $time)
-        <div class="time-option">
-            <input type="radio" id="time-{{ $time->id }}" name="time_id" value="{{ $time->id }}" required>
-            <label for="time-{{ $time->id }}" class="time-label">
-                {{ $time->start_time }} - {{ $time->end_time }}
-            </label>
+        <div class="mb-3">
+            <label>Nomor Kontak</label>
+            <input type="text" name="contact_number" class="form-control" required>
         </div>
-    @endforeach
-</div>
-    <!-- Submit -->
-    <button type="submit" class="book-button">
-        <i class="fas fa-calendar-check"></i> Booking Sekarang
-    </button>
+
+        <button type="submit" class="btn btn-success w-100">Booking Sekarang</button>
+    </div>
 </form>
-        </div>
-    </div>
 
+<script>
+const price = document.getElementById('summary-price').dataset.price;
+
+// Pilih tanggal
+document.querySelectorAll('[data-date]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-date]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('summary-date').textContent = btn.textContent;
+        document.getElementById('input-date').value = btn.dataset.date;
+    });
+});
+
+// Pilih jam
+document.querySelectorAll('[data-time]').forEach(btn => {
+    if (!btn.classList.contains('disabled')) {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-time]').forEach(b => b.classList.remove('btn-success'));
+            btn.classList.add('btn-success');
+
+            let startTime = btn.dataset.time;
+            let endHour = parseInt(startTime.split(':')[0]) + 1;
+            let endTime = (endHour<10?'0':'') + endHour + ':00';
+
+            document.getElementById('summary-time').textContent = startTime + ' - ' + endTime;
+            document.getElementById('input-time').value = startTime;
+            document.getElementById('input-end-time').value = endTime;
+            document.getElementById('input-total-price').value = price;
+        });
+    }
+});
+</script>
 </body>
 </html>

@@ -1,15 +1,15 @@
 <?php
-// App\Http\Controllers\LapController.php
+
 namespace App\Http\Controllers;
 
 use App\Models\City;
-use App\Models\Venues;     // <- pastikan 'Venues' (bukan 'venues')
+use App\Models\Venues;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
 class LapController extends Controller
 {
-     public function index()
+    public function index()
     {
         $cities = City::all();
         $categories = Category::all();
@@ -21,27 +21,28 @@ class LapController extends Controller
     // Show detail venue
     public function show(Venues $venue)
     {
-        // eager load relasi
-        $venue->load(['city','category','images']);
+        // Eager load relasi
+        $venue->load(['city', 'category', 'images', 'facilities']);
 
         return view('venue.show', compact('venue'));
     }
 
     public function filter(Request $request)
-{
-    $query = Venues::with(['city', 'category', 'images']);
+    {
+        $query = Venues::with(['city', 'category', 'images']);
 
-    if ($request->city_id) {
-        $query->where('city_id', $request->city_id);
+        if ($request->city_id) {
+            $query->where('city_id', $request->city_id);
+        }
+
+        if ($request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $venues = $query->get();
+        $venues = $query->orderBy('id', 'desc')->get();
+
+        // biar JSON response sesuai kebutuhan AJAX
+        return response()->json($venues);
     }
-
-    if ($request->category_id) {
-        $query->where('category_id', $request->category_id);
-    }
-
-    $venues = $query->get();
-
-    // biar JSON response sesuai kebutuhan AJAX
-    return response()->json($venues);
-}
 }

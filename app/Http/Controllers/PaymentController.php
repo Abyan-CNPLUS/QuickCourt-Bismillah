@@ -2,64 +2,74 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Payment;
 use Illuminate\Http\Request;
+use App\Models\Booking;
+use App\Models\Payment;
+use Midtrans\Snap;
+use Midtrans\Config;
 
 class PaymentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function show($bookingId)
     {
-        //
+        $booking = Booking::findOrFail($bookingId);
+
+        // Ambil payment
+        $payment = Payment::where('booking_id', $bookingId)->first();
+
+        // Set konfigurasi Midtrans
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => 'BOOKING-'.$booking->id,
+                'gross_amount' => $payment->amount,
+            ],
+            'customer_details' => [
+                'first_name' => $booking->user->name,
+                'email' => $booking->user->email,
+                'phone' => $booking->contact_number,
+            ],
+        ];
+
+        $snapToken = Snap::getSnapToken($params);
+
+        return view('payment', compact('booking','payment','snapToken'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // endpoint untuk update status Midtrans
+    public function callback(Request $request)
     {
-        //
-    }
+        $notif = new \Midtrans\Notification();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $orderId = str_replace('BOOKING-', '', $notif->order_id);
+        $payment = Payment::where('booking_id', $orderId)->first();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Payment $payment)
-    {
-        //
-    }
+        if($notif->transaction_status == 'capture' || $notif->transaction_status == 'settlement'){
+            $payment->status = 'approved';
+            $payment->payment_date = now();
+            $payment->save();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Payment $payment)
-    {
-        //
-    }
+            $payment->booking->status = 'confirmed';
+            $payment->booking->save();
+        } elseif($notif->transaction_status == 'deny' || $notif->transaction_status == 'cancel'){
+            $payment->status = 'rejected';
+            $payment->save();
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Payment $payment)
-    {
-        //
+        return response()->json(['success'=>true]);
     }
+    public function status($paymentId)
+{
+    $payment = Payment::findOrFail($paymentId);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Payment $payment)
-    {
-        //
-    }
+    return response()->json([
+        'status' => $payment->status,
+        'payment_date' => $payment->payment_date,
+    ]);
+}
+
 }

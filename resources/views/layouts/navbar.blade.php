@@ -9,13 +9,17 @@
                 </ul>
             </div>
 
-      <div class="navbar-right">
+    <div class="navbar-right">
     @auth
         <div onclick="toggleUserDropdown()">
             <img src="{{asset('img/profile.avif')}}" alt="Profile" class="avatar">
+
             <div class="dropdown-user" id="dropdownUser">
+                {{-- Tambah Username di paling atas dropdown --}}
+
+
                 <div class="profile-link">
-                    <a href="#"><i class="fa-regular fa-user" style="margin-right: 10px"></i>Profil</a>
+                    <a href="#"><i class="fa-regular fa-user" style="margin-right: 10px"></i>Profile</a>
                 </div>
 
                 @if(auth()->user()->role === 'admin')
@@ -26,11 +30,11 @@
                     </div>
                 @endif
 
+
                 <form method="POST" action="{{ route('logout')}}">
                     @csrf
                     <button type="submit" class="logout-btn">
-                        <i class="fa-solid fa-right-from-bracket" style="margin-right: 10px"></i>Logout
-                    </button>
+                        <i class="fa-solid fa-right-from-bracket" style="margin-right: 10px"></i>Logout</button>
                 </form>
             </div>
         </div>
@@ -40,6 +44,7 @@
         </a>
     @endauth
 </div>
+
         </nav>
     </div>
 

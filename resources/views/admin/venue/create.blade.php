@@ -172,8 +172,32 @@
             <div class="form-group">
                 <label for="capacity">Capacity</label>
                <input type="number" name="capacity" class="form-control" required class="mt-2">
-
             </div>
+
+            {{-- Facilities --}}
+        <div class="form-group">
+        <label>Facilities</label>
+        <div style="display:flex; flex-wrap: wrap; gap:12px; margin-top:8px;">
+        @foreach($facilities as $facility)
+            <label style="display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; cursor:pointer;">
+                <input
+                    type="checkbox"
+                    name="facilities[]"
+                    value="{{ $facility->id }}"
+                    {{ in_array($facility->id, old('facilities', [])) ? 'checked' : '' }}
+                >
+                {{-- kalau kamu sudah punya helper facility_icon(), boleh tampilkan --}}
+                {{-- <span>{!! facility_icon($facility->name) !!}</span> --}}
+                <span>{{ $facility->name }}</span>
+            </label>
+             @endforeach
+        </div>
+        @error('facilities.*')
+        <div style="color:#b91c1c; font-size:12px; margin-top:6px;">{{ $message }}</div>
+        @enderror
+    </div>
+
+
             <div class="form-group">
                 <label for="image">Upload Image</label>
                 <input type="file" name="images[]" multiple accept="image/*" class="mt-2" required>

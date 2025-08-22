@@ -1,0 +1,93 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: right;
+  height: 70px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px 20px;
+  z-index: 999;
+  transition: background 0.3s ease, backdrop-filter 0.3s ease;
+  background-color: blueviolet;
+  /* box-shadow: 0 2px 10px rgba(0,0,0,0.1); */
+  position: sticky;
+}
+
+.navbar.scrolled {
+  background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
+  backdrop-filter: blur(10px);
+  transition: background 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+nav {
+  /* display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100px;
+  gap: 50vh;
+  padding: 10px 20px; */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1500px;
+}
+
+.navigation {
+  /* display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  padding: 10px;
+  margin-right: 50px; */
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navigation ul {
+  /* display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 30px;
+  justify-content: center; */
+  display: flex;
+  gap: 30px;
+  list-style: none;
+}
+
+.navigation ul li {
+  list-style: none;
+}
+
+.navigation ul li a {
+  transition: all 0.3s ease;
+  color: white;
+
+}
+
+.navigation ul li a:hover {
+  background: black;
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.navigation ul li.active a {
+  color: #fff;
+  background: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+
+.dropdown-title {
+    width: 500px;
+    height: 10px;
+}

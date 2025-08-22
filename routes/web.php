@@ -1,11 +1,11 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\FoodMenuController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\BookingController;
+use App\Http\Controllers\MemesanController;
 use App\Http\Controllers\RegisController;
 use App\Http\Controllers\LapController;
 use App\Http\Controllers\DashboardController;
@@ -27,10 +27,8 @@ Route::get('/wow/{venue}', [LapController::class, 'show'])->name('lapangan.show'
 Route::get('/register', [RegisController::class, 'create'])->name('register');
 Route::post('/register', [RegisController::class, 'adduser'])->name('regis.store');
 
-Route::middleware(['auth'])->group(function () {
-Route::get('/book', [BookingController::class, 'index'])->name('booking.index');
-Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
-});
+Route::get('/bookings/create/{id}', [MemesanController::class, 'create'])->name('bookings.create.withVenue');
+
 
     route::get('/struck',[ AdminVenueController::class,"struck"]);
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
@@ -48,3 +46,14 @@ Route::post('/booking', [BookingController::class, 'store'])->name('booking.stor
 Route::post('/test-form-store', function (\Illuminate\Http\Request $request) {
     dd('DATA MASUK', $request->all());
 })->name('test.form.store');
+
+Route::get('/bookings/create/{venueId}', [MemesanController::class, 'create'])
+    ->name('bookings.create');
+
+// Simpan booking
+Route::post('/bookings/store', [MemesanController::class, 'store'])
+    ->name('bookings.store');
+
+// Halaman pembayaran
+Route::get('/payment/{bookingId}', [PaymentController::class,'show'])->name('bookings.payment');
+Route::post('/payment/callback', [PaymentController::class,'callback']); 

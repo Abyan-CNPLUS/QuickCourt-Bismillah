@@ -1,23 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ $venue->name }} - Detail Venue</title>
+
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ asset('css/venues.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/nav2.css') }}">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 </head>
-<body>
-  @extends('layouts.app')
+<body class="bg-gray-100">
 
-@extends('layouts.app')
+{{-- Import helper di blade --}}
+@php
+use App\Helpers\FacilityHelper;
+@endphp
 
-@section('content')
+{{-- Header --}}
+@include("layouts.header")
+
 <div class="container mx-auto px-4 py-6">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        {{-- Carousel Gambar --}}
+        {{-- Carousel + Info + Maps --}}
         <div class="md:col-span-2 space-y-4">
+            {{-- Carousel --}}
             @if ($venue->images && $venue->images->count() > 0)
                 <div class="swiper rounded-lg overflow-hidden">
                     <div class="swiper-wrapper">
@@ -25,7 +38,7 @@
                             <div class="swiper-slide">
                                 <img src="{{ asset('storage/' . $img->image_url) }}"
                                      alt="{{ $venue->name }}"
-                                     class="w-full h-72 object-cover">
+                                     class="w-full h-72 object-cover" />
                             </div>
                         @endforeach
                     </div>
@@ -36,41 +49,90 @@
             @else
                 <img src="{{ asset('images/no-image.png') }}"
                      alt="No Image"
-                     class="w-full h-72 object-cover rounded-lg">
+                     class="w-full h-72 object-cover rounded-lg" />
             @endif
 
-            {{-- Info --}}
+            {{-- Info Venue --}}
             <div class="bg-white shadow rounded-lg p-4 space-y-2">
                 <h1 class="text-3xl font-bold text-gray-800">{{ $venue->name }}</h1>
                 <p class="text-gray-600"><strong>Alamat:</strong> {{ $venue->address }}</p>
-                <p class="text-gray-600"><strong>Kota:</strong> {{ $venue->city->name ?? '-' }}</p>
-                <p class="text-gray-600"><strong>Kategori:</strong> {{ $venue->category->name ?? '-' }}</p>
+                <p class="text-gray-600"><strong>Kota:</strong> {{ optional($venue->city)->name ?? '-' }}</p>
+                <p class="text-gray-600"><strong>Kategori:</strong> {{ optional($venue->category)->name ?? '-' }}</p>
                 <p class="text-gray-600"><strong>Kapasitas:</strong> {{ $venue->capacity }} orang</p>
                 <p class="text-gray-600"><strong>Harga:</strong> Rp {{ number_format($venue->price, 0, ',', '.') }}</p>
             </div>
+
+            {{-- Maps --}}
+            <div class="bg-white shadow rounded-lg p-4">
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">Lokasi Venue</h2>
+                <div class="w-full h-64 rounded overflow-hidden">
+                    <iframe
+                        src="https://www.google.com/maps?q={{ urlencode($venue->address) }}&output=embed"
+                        width="100%"
+                        height="100%"
+                        style="border:0;"
+                        allowfullscreen
+                        loading="lazy">
+                    </iframe>
+                </div>
+            </div>
         </div>
 
-        {{-- Card Booking --}}
-        <div class="md:col-span-1">
-            <div class="sticky top-24 bg-white shadow-md rounded-lg p-6 border border-gray-200">
-                <h2 class="text-xl font-semibold mb-4">Booking Sekarang</h2>
-                <form action="#" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                        <input type="date" name="date" class="w-full border rounded px-3 py-2">
+        {{-- Fasilitas --}}
+        <div class="bg-white shadow rounded-lg p-4" style="height: 45%; width:115%">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Fasilitas</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-5">
+                @forelse ($venue->facilities as $facility)
+                    <div class="flex items-center space-x-2">
+                        <span class="text-2xl">{{ FacilityHelper::icon($facility->name) }}</span>
+                        <span>{{ $facility->name }}</span>
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-                        Booking Sekarang
-                    </button>
-                </form>
+                @empty
+                    <p class="text-gray-500">Belum ada fasilitas tersedia.</p>
+                @endforelse
             </div>
+            {{-- Card Booking --}}
+        <div style="margin-top: 25px">
+            <div class="bg-white shadow rounded-lg p-4">
+                <h2 class="text-xl font-semibold text-gray-800 mb-3">Booking</h2>
+                <p class="text-gray-600 mb-3">Pesan lapangan dengan mudah.</p>
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
+                    <a href="{{ route('bookings.create.withVenue', $venue->id) }}" class="btn btn-primary">Booking Sekarang</a>
+                </button>
+            </div>
+        </div>
         </div>
     </div>
 </div>
 
+{{-- Footer --}}
+<footer class="bg-gray-900 text-gray-300 mt-10">
+    <div class="container mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            <h3 class="text-lg font-bold text-white mb-2">QuickCourt</h3>
+            <p class="text-sm">Platform booking lapangan olahraga cepat & mudah.</p>
+        </div>
+        <div>
+            <h3 class="text-lg font-bold text-white mb-2" style="text-align: center">Kontak</h3>
+            <p class="text-sm">📍 {{ $venue->address }}</p>
+            <p class="text-sm">📞 0812-3456-7890</p>
+            <p class="text-sm">✉️ quickcourt@email.com</p>
+        </div>
+        <div>
+            <h3 class="text-lg font-bold text-white mb-2" style="text-align: center">Ikuti Kami</h3>
+            <div class="flex space-x-4">
+                <a href="#" class="hover:text-white">🌐 IG</a>
+                <a href="#" class="hover:text-white">💬 WA</a>
+                <a href="#" class="hover:text-white">🎵 TikTok</a>
+            </div>
+        </div>
+    </div>
+    <div class="bg-gray-800 text-center py-3 text-sm">
+        © {{ date('Y') }} QuickCourt. All rights reserved.
+    </div>
+</footer>
+
 {{-- Swiper JS --}}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
     new Swiper('.swiper', {
@@ -79,6 +141,6 @@
         navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
     });
 </script>
-@endsection
+
 </body>
 </html>

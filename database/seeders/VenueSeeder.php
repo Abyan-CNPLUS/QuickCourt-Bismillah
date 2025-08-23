@@ -4,82 +4,64 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 
 class VenueSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $now = Carbon::now();
-
-        $venues = [
+        DB::table('venues')->insert([
             [
-                'name' => 'Haji Putra Mini Socc Jl. Sport Center No.',
-                'address' => 'Haji Putra Mini Socc Jl. Sport Center No.',
-                'capacity' => 100,
-                'price' => 1000000,
-                'status' => 'available',
-                'category_id' => 1,
-                'city_id' => 1,
-                'open_time' => '08:00:00',
+                'user_id'     => 1, // asumsi user_id = 1
+                'name'       => 'GOR Bima Sakti',
+                'address'    => 'Jl. Merdeka No.10, Jakarta',
+                'capacity'   => 200,
+                'price'      => '150000',
+                'status'     => 'available',
+                'category_id'=> 1, // asumsi ada category futsal/basket
+                'city_id'    => 1, // asumsi city_id = 1
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+                'open_time'  => '08:00:00',
                 'close_time' => '22:00:00',
-                'created_at' => $now,
-                'updated_at' => $now,
+                'deskripsi'  => 'Venue olahraga indoor dengan fasilitas lengkap.',
+                'rules'      => 'Dilarang merokok di dalam arena.',
             ],
             [
-                'name' => 'GOR Futsal Bandung Barat',
-                'address' => 'Jl. Raya Lembang No.5, Bandung Barat',
-                'capacity' => 80,
-                'price' => 850000,
-                'status' => 'available',
-                'category_id' => 1,
-                'city_id' => 1,
-                'open_time' => '07:00:00',
-                'close_time' => '23:00:00',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'name' => 'Arena Mini Soccer Depok',
-                'address' => 'Jl. Margonda Raya No.88, Depok',
-                'capacity' => 120,
-                'price' => 950000,
-                'status' => 'available',
-                'category_id' => 2,
-                'city_id' => 2,
-                'open_time' => '06:00:00',
+                'user_id'     => 1,
+                'name'       => 'Lapangan Outdoor Cempaka',
+                'address'    => 'Jl. Cempaka Raya No.5, Bandung',
+                'capacity'   => 100,
+                'price'      => '100000',
+                'status'     => 'available',
+                'category_id'=> 2, 
+                'city_id'    => 2,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+                'open_time'  => '07:00:00',
                 'close_time' => '21:00:00',
-                'created_at' => $now,
-                'updated_at' => $now,
+                'deskripsi'  => 'Lapangan outdoor cocok untuk badminton & futsal.',
+                'rules'      => 'Bawa peralatan olahraga sendiri.',
             ],
             [
-                'name' => 'Lapangan Mega Soccer Jakarta Timur',
-                'address' => 'Jl. Pemuda No.17, Jakarta Timur',
-                'capacity' => 150,
-                'price' => 1250000,
-                'status' => 'available',
-                'category_id' => 2,
-                'city_id' => 3,
-                'open_time' => '08:00:00',
-                'close_time' => '00:00:00',
-                'created_at' => $now,
-                'updated_at' => $now,
+                'user_id'     => 2,
+                'name'       => 'Arena Basket Galaxy',
+                'address'    => 'Jl. Galaxy Barat No.22, Surabaya',
+                'capacity'   => 150,
+                'price'      => '200000',
+                'status'     => 'available',
+                'category_id'=> 3, // misal kategori basket
+                'city_id'    => 3,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+                'open_time'  => '09:00:00',
+                'close_time' => '23:00:00',
+                'deskripsi'  => 'Arena basket standar nasional.',
+                'rules'      => 'Gunakan sepatu basket khusus.',
             ],
-            [
-                'name' => 'Soccer Dome Bekasi',
-                'address' => 'Jl. Kalimalang No.33, Bekasi',
-                'capacity' => 90,
-                'price' => 900000,
-                'status' => 'available',
-                'category_id' => 1,
-                'city_id' => 4,
-                'open_time' => '09:00:00',
-                'close_time' => '22:00:00',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-        ];
-
-        DB::table('venues')->insert($venues);
+        ]);
     }
 }

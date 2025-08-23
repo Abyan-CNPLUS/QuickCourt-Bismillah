@@ -25,8 +25,14 @@ class VenuesController extends Controller
             $query = Venues::with(['category', 'city', 'primaryImage'])
                 ->orderBy('created_at', 'asc');
 
+
             if ($request->has('category') && $request->category != 0) {
                 $query->where('category_id', $request->category);
+            }
+
+
+            if ($request->has('search') && $request->search != '') {
+                $query->where('name', 'LIKE', '%' . $request->search . '%');
             }
 
             $venues = $query->paginate($perPage);
@@ -38,6 +44,7 @@ class VenuesController extends Controller
             ], 500);
         }
     }
+
 
 
     public function store(Request $request)

@@ -28,21 +28,25 @@ class LapController extends Controller
     }
 
     public function filter(Request $request)
-    {
-        $query = Venues::with(['city', 'category', 'images']);
+{
+    $query = Venues::with(['city', 'category', 'images']);
 
-        if ($request->city_id) {
-            $query->where('city_id', $request->city_id);
-        }
-
-        if ($request->category_id) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        $venues = $query->get();
-        $venues = $query->orderBy('id', 'desc')->get();
-
-        // biar JSON response sesuai kebutuhan AJAX
-        return response()->json($venues);
+    if ($request->city_id) {
+        $query->where('city_id', $request->city_id);
     }
+
+    if ($request->category_id) {
+        $query->where('category_id', $request->category_id);
+    }
+
+    // Sorting
+    if ($request->sort_by) {
+        [$field, $direction] = explode('-', $request->sort_by);
+        $query->orderBy($field, $direction);
+    } else {
+        $query->orderBy('updated_at', 'desc'); // default
+    }
+
+    return response()->json($query->get());
+}
 }

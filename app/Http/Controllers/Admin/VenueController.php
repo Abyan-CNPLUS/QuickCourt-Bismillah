@@ -123,6 +123,20 @@ class VenueController extends Controller
     $venueData = collect($validated)->except('facilities')->toArray();
     $venue->update($venueData);
 
+    // Update gambar jika ada upload baru
+if ($request->hasFile('images')) {
+    foreach ($request->file('images') as $index => $image) {
+        $path = $image->store('venues', 'public');
+
+        VenueImage::create([
+            'venue_id'   => $venue->id,
+            'image_url'  => $path,
+            'is_primary' => $venue->images()->count() === 0 && $index === 0 ? 1 : 0,
+        ]);
+    }
+}
+
+
     // Update fasilitas
     $venue->facilities()->sync($request->facilities ?? []);
 
@@ -135,23 +149,18 @@ class VenueController extends Controller
 
     // Hapus venue
     public function destroy(Venues $venue)
-    {
-        if ($venue->image && Storage::disk('public')->exists($venue->image)) {
-            Storage::disk('public')->delete($venue->image);
+{
+    // Hapus semua gambar terkait
+    foreach ($venue->images as $img) {
+        if (Storage::disk('public')->exists($img->image_url)) {
+            Storage::disk('public')->delete($img->image_url);
         }
-
-        $venue->delete();
-
-        return redirect()->route('admin.venues.index')
-            ->with('success', 'Venue berhasil dihapus!');
+        $img->delete();
     }
 
-    // Contoh halaman struck
-    public function struck()
-    {
-        $random = rand(1000, 9999);
-        $date   = now()->format('d-m-Y H:i:s');
+    $venue->delete();
 
-        return view('admin.venues.struck', compact('random', 'date'));
-    }
+    return redirect()->route('admin.venues.index')
+        ->with('success', 'Venue berhasil dihapus!');
+}
 }

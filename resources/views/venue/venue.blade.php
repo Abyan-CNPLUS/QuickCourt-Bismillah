@@ -1,122 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-         <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <meta http-equiv="X-UA-Compatible" content="ie=edge">
-          <link rel="stylesheet" href="{{asset('css/style.css')}}">
-            <link rel="apple-touch-icon" sizes="100x100" href="../assets/img/apple-icon.png">
-            <link rel="icon" type="image/png" href="{{asset('img/logo.png')}}">
-                <title>Venue</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-        </head>
-        <body>
-            @include('layouts.navbar')
-            @include('layouts.app')
-            <div class="kepala">
-            <div class="kiri-kepala" style="margin-left: 20px">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="apple-touch-icon" sizes="100x100" href="{{ asset('assets/img/apple-icon.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
+    <title>Venue</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <style>
+        .kepala {
+            position: relative;
+            width: 100%;
+            height: 400px;
+        }
+        .kepala .swiper {
+            width: 100%;
+            height: 100%;
+        }
+        .kepala .swiper-slide img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        /* overlay text */
+        .kepala .kiri-kepala {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
 
-                <div>
-            <h1 style="color: white; text-align: center; height:100px; margin-top:100px">Pesan Lapangan Lebih Cepat, Main Lebih Puas</h1>
-            </div>
-            <div class="button-wrapper" style="margin-top: -100px; text-align: center; width:50%">
-                <button class="button-89" role="button">Daftarkan Venue</button>
-            </div>
-        </div> {{-- <button class="button-19" role="button">Button 19</button> --}}
-    </div>
-    @include('layouts.filter2')
-    <div id="venue-container" class="venue-container">
-        @php
-        // Pakai data yang ada: $menus atau $fnbMenus
-        $list = isset($venues) ? $venues : ($venues ?? collect());
-    @endphp
+        }
+        .kepala .kiri-kepala h1 {
+            color: #fff;
+            text-align: center;
+            font-size: 32px;
+        }
+    </style>
+</head>
+<body>
+    @include('layouts.navbar')
+    @include('layouts.app')
 
-    @forelse($list as $venue)
-        <div class="menu-card">
-            <div class="venue-image">
-                <img
-                    src="{{ $venue->image ? asset('storage/' . $venue->image) : asset('images/default.jpg') }}"
-                    alt="{{ $venue->name }}"
-                >
+    {{-- Hero dengan Carousel --}}
+    <div class="kepala">
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <img src="{{ asset('img/Basket.jpg') }}" alt="Banner 1">
+                </div>
+                <div class="swiper-slide">
+                    <img src="{{ asset('img/image.png') }}" alt="Banner 2">
+                </div>
+                <div class="swiper-slide">
+                    <img src="{{ asset('img/banner3.jpg') }}" alt="Banner 3">
+                </div>
             </div>
-            <div class="venue-content">
-                <h3 class="menu-title">{{ $venue->name }}</h3>
-                <p class="menu-price">
-                    Rp {{ number_format($venue->price, 0, ',', '.') }}
-                </p>
-                <p class="menu-desc">{{ $venue->description }}</p>
-                <a href="#" class="order-btn">Pesan Sekarang</a>
+
+            <!-- Navigasi -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <div class="kiri-kepala">
+            <div class="button-wrapper" style="margin-top: 20px; text-align: center; width:50%">
+                {{-- tombol CTA kalau perlu --}}
             </div>
         </div>
-    @empty
-        <p>Tidak ada menu.</p>
-    @endforelse
     </div>
+
+    {{-- Filter --}}
+    @include('layouts.filter2')
+
+    {{-- Venue Container --}}
+    <div id="venue-container" class="venue-container">
+        @forelse($venues as $venue)
+            @php
+                $image = $venue->images->first()
+                    ? asset('storage/' . $venue->images->first()->image_url)
+                    : asset('images/default.jpg');
+            @endphp
+            <div class="venue-card">
+                <div class="venue-image">
+                    <img src="{{ $image }}" alt="{{ $venue->name }}" width="150">
+                </div>
+                <div class="venue-content">
+                    <h3>{{ $venue->name }}</h3>
+                    <p>{{ $venue->city->name ?? '-' }}</p>
+                    <p>{{ $venue->category->name ?? '-' }}</p>
+                    <p class="menu-price">Rp {{ number_format($venue->price, 0, ',', '.') }}</p>
+                    <a href="{{ route('lapangan.show', $venue->id) }}" class="order-btn">Lihat Detail</a>
+                </div>
+            </div>
+        @empty
+            <p>Tidak ada venue.</p>
+        @endforelse
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function () {
-    loadVenues(); // pertama kali load semua
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        // Swiper init
+        var swiper = new Swiper(".mySwiper", {
+            loop: true,
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        });
 
-    // ketika filter berubah
-    $('#city_id, #category_id').on('change', function () {
-        loadVenues();
-    });
-function formatRupiah(angka) {
-    return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-
-    function loadVenues() {
-    let cityId = $('#city_id').val();
-    let categoryId = $('#category_id').val();
-
-    $.ajax({
-        url: "{{ route('venues.filter') }}",
-        method: "GET",
-        data: {
-            city_id: cityId,
-            category_id: categoryId
-        },
-        success: function (data) {
-            let html = '';
-
-            if (!Array.isArray(data) || data.length === 0) {
-                html = `<p>Tidak ada venue sesuai filter.</p>`;
-            } else {
-                data.forEach(function (venue) {
-                    let img = venue.images.length > 0
-                        ? '/storage/' + venue.images[0].image_url
-                        : '/images/default.jpg';
-
-                    // 👉 letakkan di sini
-                    let showUrl = "{{ route('lapangan.show', ':id') }}";
-                    showUrl = showUrl.replace(':id', venue.id);
-
-                    html += `
-                        <div class="venue-card">
-                            <div class="venue-image">
-                                <img src="${img}" alt="${venue.name}" width="150">
-                            </div>
-                            <div class="venue-content">
-                                <h3>${venue.name}</h3>
-                                <p>${venue.city ? venue.city.name : '-'}</p>
-                                <p>${venue.category ? venue.category.name : '-'}</p>
-                                <p class="menu-price">${formatRupiah(venue.price)}</p>
-                                <a href="${showUrl}" class="order-btn">Lihat Detail</a>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            $('#venue-container').html(html);
-        },
-        error: function(xhr) {
-            console.error(xhr.responseText);
-            $('#venue-container').html(`<p style="color:red;">Terjadi kesalahan memuat venue.</p>`);
+        // Format Rupiah & Filter
+        function formatRupiah(angka) {
+            return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
-    });
-}
-});
-</script>
+
+        function applyFilters() {
+            let cityId = $('#city_id').val();
+            let categoryId = $('#category_id').val();
+
+            $.ajax({
+                url: "{{ route('venues.filter') }}",
+                method: "GET",
+                data: { city_id: cityId, category_id: categoryId },
+                success: function (data) {
+                    let html = '';
+                    if (!Array.isArray(data) || data.length === 0) {
+                        html = `<p>Tidak ada venue</p>`;
+                    } else {
+                        data.forEach(function (venue) {
+                            let img = venue.images.length > 0
+                                ? '/storage/' + venue.images[0].image_url
+                                : '/images/default.jpg';
+
+                            let showUrl = "{{ route('lapangan.show', ':id') }}".replace(':id', venue.id);
+
+                            html += `
+                                <div class="venue-card">
+                                    <div class="venue-image">
+                                        <img src="${img}" alt="${venue.name}" width="150">
+                                    </div>
+                                    <div class="venue-content">
+                                        <h3>${venue.name}</h3>
+                                        <p>${venue.city ? venue.city.name : '-'}</p>
+                                        <p>${venue.category ? venue.category.name : '-'}</p>
+                                        <p class="menu-price">${formatRupiah(venue.price)}</p>
+                                        <a href="${showUrl}" class="order-btn">Lihat Detail</a>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                    $('#venue-container').html(html);
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                    $('#venue-container').html(`<p style="color:red;">Terjadi kesalahan memuat venue.</p>`);
+                }
+            });
+        }
+    </script>
 </body>
 </html>

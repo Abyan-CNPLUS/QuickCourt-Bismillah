@@ -121,22 +121,6 @@
                     </div>
                 </div>
                 <div class="span"></div>
-                <div class="filter-option">
-                    <div class="filter-icon">
-                        <i class="fa-solid fa-money-bill fa-2x"></i>
-                        {{-- <i class="fas fa-futbol"></i> --}}
-                    </div>
-                    <span></span>
-                    <div class="filter-name">
-                        {{-- <label for="location">Harga:</label> --}}
-                        <select id="price">
-                            <option value="all">Semua Harga</option>
-                            <option value="indoor">Harga Terendah</option>
-                            <option value="outdoor">Harga Tertinggi</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="span"></div>
 
                 <button class="filter-button" onclick="applyFilters()">Tampilkan</button>
             </div>

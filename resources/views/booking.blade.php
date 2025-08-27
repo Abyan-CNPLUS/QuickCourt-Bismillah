@@ -9,26 +9,6 @@
 <body>
 <div class="container my-4">
 
-    {{-- Header Venue --}}
-   <div class="card shadow mb-4">
-    @if($venue->images->isNotEmpty())
-        <img
-            src="{{ asset('storage/' . $venue->images->first()->image_url) }}"
-            class="card-img-top"
-            alt="{{ $venue->name }}">
-    @else
-        <img
-            src="https://via.placeholder.com/1200x400"
-            class="card-img-top"
-            alt="{{ $venue->name }}">
-    @endif
-    <div class="card-body">
-        <h3 class="card-title mb-1" style="text-align: center">{{ $venue->name }}</h3>
-        <p class="text-muted">{{ $venue->city->name ?? '-' }}</p>
-    </div>
-</div>
-
-
     {{-- Pilih Tanggal --}}
     <h5 class="mb-2">Pilih Tanggal</h5>
     <div class="d-flex overflow-auto mb-4 pb-2">
@@ -127,6 +107,5 @@ document.querySelectorAll('[data-time]').forEach(btn => {
     }
 });
 </script>
-
 </body>
 </html>

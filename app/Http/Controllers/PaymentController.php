@@ -7,18 +7,64 @@ use App\Models\Booking;
 use App\Models\Payment;
 use Midtrans\Snap;
 use Midtrans\Config;
-use Midtrans\Notification;
 
 class PaymentController extends Controller
 {
-    public function show($bookingId)
+    // === PAYMENT OPTION ===
+    public function option(Booking $booking)
     {
-        $booking = Booking::findOrFail($bookingId);
+        // Pastikan booking masih pending
+        if ($booking->status !== 'pending') {
+            return redirect()->route('bookings.create.withVenue', $booking->venue_id)
+                ->with('error', 'Booking ini sudah diproses.');
+        }
 
-        // Ambil payment
-        $payment = Payment::where('booking_id', $bookingId)->firstOrFail();
+        // Pastikan payment record ada
+        if (!$booking->payment) {
+            $booking->payment()->create([
+                'amount' => $booking->total_price,
+                'payment_method' => 'gateway', // default
+                'status' => 'pending',
+            ]);
+            $booking->load('payment');
+        }
 
-        // Set konfigurasi Midtrans
+        return view('payment.option', compact('booking'));
+    }
+
+    public function optionProcess(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'method' => 'required|in:gateway,manual',
+        ]);
+
+        // Update metode pembayaran
+        $booking->payment->update([
+            'payment_method' => $request->method,
+        ]);
+
+        if ($request->method === 'gateway') {
+            return redirect()->route('payments.gateway', $booking->id);
+        } else {
+            return redirect()->route('payments.manual', $booking->id);
+        }
+    }
+
+    // === GATEWAY PAYMENT (Midtrans) ===
+    public function gateway($bookingId)
+    {
+        $booking = Booking::with('payment', 'user')->findOrFail($bookingId);
+
+        // Buat payment jika belum ada
+        if (!$booking->payment) {
+            $booking->payment()->create([
+                'amount' => $booking->total_price,
+                'payment_method' => 'gateway',
+                'status' => 'pending',
+            ]);
+            $booking->load('payment');
+        }
+
         Config::$serverKey = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized = config('midtrans.is_sanitized');
@@ -27,7 +73,7 @@ class PaymentController extends Controller
         $params = [
             'transaction_details' => [
                 'order_id' => 'BOOKING-' . $booking->id,
-                'gross_amount' => $payment->amount,
+                'gross_amount' => $booking->payment->amount,
             ],
             'customer_details' => [
                 'first_name' => $booking->user->name,
@@ -38,57 +84,77 @@ class PaymentController extends Controller
 
         $snapToken = Snap::getSnapToken($params);
 
-        return view('payment', compact('booking', 'payment', 'snapToken'));
+        return view('payment.midtrans', compact('booking', 'snapToken'));
     }
 
-    /**
-     * Endpoint Callback dari Midtrans
-     */
-    public function callback(Request $request)
+    public function gatewayCallback(Request $request)
     {
-        $notif = new Notification();
+        $bookingId = str_replace('BOOKING-', '', $request->order_id);
+        $payment = Payment::where('booking_id', $bookingId)->first();
 
-        $orderId = str_replace('BOOKING-', '', $notif->order_id);
-        $payment = Payment::where('booking_id', $orderId)->first();
+        if (!$payment) return response()->json(['message' => 'Payment not found'], 404);
 
-        if (!$payment) {
-            return response()->json(['message' => 'Payment not found'], 404);
+        switch ($request->transaction_status) {
+            case 'capture':
+            case 'settlement':
+                $payment->update([
+                    'status' => 'success',
+                    'payment_date' => now(),
+                ]);
+                $payment->booking->update(['status' => 'confirmed']);
+                break;
+            case 'pending':
+                $payment->update(['status' => 'pending']);
+                break;
+            case 'deny':
+            case 'cancel':
+            case 'expire':
+                $payment->update(['status' => 'failed']);
+                $payment->booking->update(['status' => 'cancelled']);
+                break;
         }
-
-        $transaction = $notif->transaction_status;
-        $type        = $notif->payment_type;
-        $fraud       = $notif->fraud_status ?? null;
-
-        if ($transaction == 'capture') {
-            if ($type == 'credit_card') {
-                if ($fraud == 'challenge') {
-                    $payment->status = 'challenge';
-                } else {
-                    $payment->status = 'approved';
-                    $payment->payment_date = now();
-                    $payment->booking->status = 'confirmed';
-                    $payment->booking->save();
-                }
-            }
-        } elseif ($transaction == 'settlement') {
-            $payment->status = 'approved';
-            $payment->payment_date = now();
-            $payment->booking->status = 'confirmed';
-            $payment->booking->save();
-        } elseif ($transaction == 'pending') {
-            $payment->status = 'pending';
-        } elseif ($transaction == 'deny' || $transaction == 'cancel' || $transaction == 'expire') {
-            $payment->status = 'rejected';
-        }
-
-        $payment->save();
 
         return response()->json(['success' => true]);
     }
 
-    /**
-     * Endpoint untuk polling status via AJAX
-     */
+    // === MANUAL PAYMENT (Hybrid) ===
+    public function manual($bookingId)
+    {
+        $booking = Booking::with('payment', 'user')->findOrFail($bookingId);
+
+        // Buat payment jika belum ada
+        if (!$booking->payment) {
+            $booking->payment()->create([
+                'amount' => $booking->total_price,
+                'payment_method' => 'manual',
+                'status' => 'pending',
+            ]);
+            $booking->load('payment');
+        }
+
+        return view('payment.hybrid', compact('booking'));
+    }
+
+    public function manualUpload(Request $request, $bookingId)
+    {
+        $booking = Booking::with('payment')->findOrFail($bookingId);
+
+        $request->validate([
+            'proof' => 'required|image|max:2048',
+        ]);
+
+        $path = $request->file('proof')->store('payments', 'public');
+
+        $booking->payment->update([
+            'status' => 'waiting_verification',
+            'proof' => $path,
+        ]);
+
+        return redirect()->route('bookings.create.withVenue', $booking->venue_id)
+            ->with('success', 'Bukti transfer berhasil diupload, tunggu verifikasi admin.');
+    }
+
+    // === Optional: status polling via AJAX ===
     public function status($paymentId)
     {
         $payment = Payment::findOrFail($paymentId);
@@ -97,22 +163,5 @@ class PaymentController extends Controller
             'status' => $payment->status,
             'payment_date' => $payment->payment_date,
         ]);
-    }
-
-    /**
-     * Optional: Update manual status dari Snap JS (fallback)
-     */
-    public function updateStatus(Request $request, $paymentId)
-    {
-        $payment = Payment::findOrFail($paymentId);
-        $payment->status = $request->status;
-        if ($request->status == 'approved') {
-            $payment->payment_date = now();
-            $payment->booking->status = 'confirmed';
-            $payment->booking->save();
-        }
-        $payment->save();
-
-        return response()->json(['success' => true]);
     }
 }

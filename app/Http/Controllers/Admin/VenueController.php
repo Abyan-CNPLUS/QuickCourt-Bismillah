@@ -31,7 +31,7 @@ class VenueController extends Controller
         $cities     = City::orderBy('name')->get();
         $facilities = Facility::orderBy('name')->get();
 
-        return view('admin.venue.create', compact('categories', 'cities', 'facilities'));
+        return view('admin.venue.Aproval', compact('categories', 'cities', 'facilities'));
     }
 
     // Simpan data venue baru
@@ -163,4 +163,31 @@ if ($request->hasFile('images')) {
     return redirect()->route('admin.venues.index')
         ->with('success', 'Venue berhasil dihapus!');
 }
+
+public function approvalList()
+{
+    $venues = Venues::with(['category', 'city'])
+        ->where('approval_status', 'pending')
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+
+    return view('admin.venue.approval', compact('venues'));
+}
+
+
+public function reject($id)
+{
+    $venue = Venues::findOrFail($id);
+    $venue->update(['approval_status' => 'rejected']);
+
+    return redirect()->back()->with('success', 'Venue berhasil ditolak!');
+}
+
+public function show($id)
+{
+    $venues = Venues::with(['city', 'category', 'user'])->findOrFail($id);
+
+    return view('admin.venue.show', compact('venue'));
+}
+
 }

@@ -36,7 +36,7 @@ class Booking extends Model
 
     public function venue()
     {
-        return $this->belongsTo(Venues::class); // pastikan modelnya "Venue" bukan "Venues"
+        return $this->belongsTo(Venues::class); 
     }
 
     public function payment()

@@ -37,10 +37,13 @@ class Fnb_menu extends Model
         if (!$this->image) {
             return null;
         }
+
+        // Jika sudah http (full url)
         if (preg_match('/^http/i', $this->image)) {
             return $this->image;
         }
-        
+
+        // Lokal storage
         return asset('storage/' . ltrim($this->image, '/'));
     }
 }

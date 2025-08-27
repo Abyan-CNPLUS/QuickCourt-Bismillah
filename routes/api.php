@@ -7,17 +7,19 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CartController;
 use App\Http\Controllers\API\HomeController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\CitiesController;
 use App\Http\Controllers\API\VenuesController;
 use App\Http\Controllers\API\BookingController;
 use App\Http\Controllers\API\CategoryController;
-use App\Http\Controllers\Api\FnbOrderController;
 
+use App\Http\Controllers\Api\FnbOrderController;
+use App\Http\Controllers\Api\OwnerRegisterController;
 use App\Http\Controllers\API\BookingHistoryController;
 use App\Http\Controllers\API\Owner\OwnerVenueController;
+use App\Http\Controllers\API\Owner\BookingOwnerController;
 use App\Http\Controllers\API\VenueAvailableTimeController;
 use App\Http\Controllers\API\Owner\OwnerDashboardController;
 use App\Http\Controllers\API\Admin\BookingController as AdminBookingController;
-
 
 Route::post('/firebase-login', [AuthController::class, 'firebaseLogin']);
 Route::post('/firebase-register', [AuthController::class, 'firebaseRegister']);
@@ -28,6 +30,9 @@ Route::get('/facilities', [VenuesController::class, 'getFacilities']);
 Route::get('/venues/{id}/available-times', [VenueAvailableTimeController::class, 'index']);
 Route::get('/home', [HomeController::class, 'index']);
 Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/city', [CitiesController::class, 'index']);
+Route::patch('/venues/{venue}/toggle-status', [OwnerVenueController::class, 'toggleStatus']);
+
 
 Route::prefix('fnb')->group(function () {
     Route::get('/cities', [FnbController::class, 'getCities']);
@@ -70,12 +75,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/fnb-cart/checkout', [CartController::class, 'checkout']);
 
     Route::get('/booking-history', [BookingHistoryController::class, 'index']);
-    Route::get('/owner/dashboard', [OwnerDashboardController::class, 'index']);
+    Route::get('/owner-dashboard', [OwnerDashboardController::class, 'index']);
+    Route::get('/owner-dashboard/{venueId}', [OwnerDashboardController::class, 'show']);
+
+    Route::put('/owner/bookings/{booking}/status', [BookingOwnerController::class, 'updateStatus']);
+    Route::get('/owner/venues/{venueId}/bookings', [BookingOwnerController::class, 'index']);
 });
 
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('admin-booking', AdminBookingController::class);
 });
+
 
 

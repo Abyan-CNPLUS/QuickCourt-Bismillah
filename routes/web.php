@@ -56,4 +56,4 @@ Route::post('/bookings/store', [MemesanController::class, 'store'])
 
 // Halaman pembayaran
 Route::get('/payment/{bookingId}', [PaymentController::class,'show'])->name('bookings.payment');
-Route::post('/payment/callback', [PaymentController::class,'callback']); 
+Route::post('/payment/callback', [PaymentController::class,'callback']);

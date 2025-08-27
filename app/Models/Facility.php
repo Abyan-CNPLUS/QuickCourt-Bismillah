@@ -16,6 +16,6 @@ class Facility extends Model
     public function venues()
     {
         // facility_id -> venue_id
-        return $this->belongsToMany(Venue::class, 'facility_venue', 'facility_id', 'venue_id');
+        return $this->belongsToMany(Venues::class, 'facility_venue', 'facility_id', 'venue_id');
     }
 }

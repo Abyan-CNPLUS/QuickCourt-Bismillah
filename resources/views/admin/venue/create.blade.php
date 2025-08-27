@@ -196,13 +196,17 @@
         <div style="color:#b91c1c; font-size:12px; margin-top:6px;">{{ $message }}</div>
         @enderror
     </div>
-
-
             <div class="form-group">
                 <label for="image">Upload Image</label>
                 <input type="file" name="images[]" multiple accept="image/*" class="mt-2" required>
-
             </div>
+
+            <div class="form-group">
+                <label for="images">Upload Gambar</label>
+                <input type="file" name="images[]" id="images" class="form-control" multiple>
+                <small class="text-gray-500">Bisa pilih lebih dari 1 gambar</small>
+            </div>
+
             <button type="submit" class="btn-submit">Save Data</button>
         </form>
     </div>

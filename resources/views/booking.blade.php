@@ -10,42 +10,58 @@
 <div class="container my-4">
 
     {{-- Header Venue --}}
-    <div class="card shadow mb-4">
-        <img src="{{ $venue->image ? asset('storage/' . $venue->image) : 'https://via.placeholder.com/1200x400' }}"
-             class="card-img-top"
-             alt="{{ $venue->name }}">
-        <div class="card-body">
-            <h3 class="card-title mb-0">{{ $venue->name }}</h3>
-            <p class="text-muted">{{ $venue->city->name ?? '-' }}</p>
-        </div>
+   <div class="card shadow mb-4">
+    @if($venue->images->isNotEmpty())
+        <img
+            src="{{ asset('storage/' . $venue->images->first()->image_url) }}"
+            class="card-img-top"
+            alt="{{ $venue->name }}">
+    @else
+        <img
+            src="https://via.placeholder.com/1200x400"
+            class="card-img-top"
+            alt="{{ $venue->name }}">
+    @endif
+    <div class="card-body">
+        <h3 class="card-title mb-1" style="text-align: center">{{ $venue->name }}</h3>
+        <p class="text-muted">{{ $venue->city->name ?? '-' }}</p>
     </div>
+</div>
+
 
     {{-- Pilih Tanggal --}}
     <h5 class="mb-2">Pilih Tanggal</h5>
-    <div class="d-flex overflow-auto mb-4">
-        @foreach ($dates as $date)
-            <button type="button"
-                    class="btn btn-outline-primary me-2 {{ $loop->first ? 'active' : '' }}"
-                    data-date="{{ $date->format('Y-m-d') }}">
-                {{ $date->translatedFormat('D, d M') }}
-            </button>
-        @endforeach
-    </div>
+    <div class="d-flex overflow-auto mb-4 pb-2">
+    @foreach ($dates as $date)
+        <button type="button"
+            class="btn btn-outline-primary px-4 py-2 me-2 rounded-pill shadow-sm
+                   {{ $loop->first ? 'active' : '' }}"
+            data-date="{{ $date->format('Y-m-d') }}">
+            <i class="bi bi-calendar-event me-1"></i>
+            {{ $date->translatedFormat('D, d M') }}
+        </button>
+    @endforeach
+</div>
 
-    {{-- Pilih Jam --}}
-    <h5 class="mb-2">Pilih Jam</h5>
-    <div class="row g-2 mb-4">
-        @foreach ($times as $time)
-            <div class="col-3">
-                <button type="button"
-                        class="btn w-100 {{ in_array($time, $bookedTimes) ? 'btn-secondary disabled' : 'btn-outline-success' }}"
-                        data-time="{{ $time }}"
-                        {{ in_array($time, $bookedTimes) ? 'disabled' : '' }}>
-                    {{ $time }}
-                </button>
-            </div>
-        @endforeach
-    </div>
+
+{{-- Pilih Jam --}}
+<h5 class="mb-2">Pilih Jam</h5>
+<div class="row g-3 mb-4">
+    @foreach ($times as $time)
+        <div class="col-3">
+            <button type="button"
+                class="btn w-100 py-3 shadow-sm rounded-3
+                    {{ in_array($time, $bookedTimes) ? 'btn-outline-secondary disabled' : 'btn-outline-secondary' }}"
+                data-time="{{ $time }}"
+                {{ in_array($time, $bookedTimes) ? 'disabled' : '' }}>
+                <i class="bi bi-clock me-1"></i> {{ $time }}
+            </button>
+        </div>
+    @endforeach
+</div>
+
+
+
 
    <form action="{{ route('bookings.store') }}" method="POST">
     @csrf
@@ -66,7 +82,7 @@
             <input type="text" name="contact_number" class="form-control" required>
         </div>
 
-        <button type="submit" class="btn btn-success w-100">Booking Sekarang</button>
+        <button type="submit" class="btn btn-primary btn-lg">Booking Sekarang</button>
     </div>
 </form>
 
@@ -87,12 +103,21 @@ document.querySelectorAll('[data-date]').forEach(btn => {
 document.querySelectorAll('[data-time]').forEach(btn => {
     if (!btn.classList.contains('disabled')) {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('[data-time]').forEach(b => b.classList.remove('btn-success'));
-            btn.classList.add('btn-success');
+            // reset semua ke abu-abu
+            document.querySelectorAll('[data-time]').forEach(b => {
+                if (!b.classList.contains('disabled')) {
+                    b.classList.remove('btn-info');
+                    b.classList.add('btn-outline-secondary');
+                }
+            });
+
+            // set tombol aktif jadi biru muda
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-info');
 
             let startTime = btn.dataset.time;
             let endHour = parseInt(startTime.split(':')[0]) + 1;
-            let endTime = (endHour<10?'0':'') + endHour + ':00';
+            let endTime = (endHour < 10 ? '0' : '') + endHour + ':00';
 
             document.getElementById('summary-time').textContent = startTime + ' - ' + endTime;
             document.getElementById('input-time').value = startTime;
@@ -102,5 +127,6 @@ document.querySelectorAll('[data-time]').forEach(btn => {
     }
 });
 </script>
+
 </body>
 </html>

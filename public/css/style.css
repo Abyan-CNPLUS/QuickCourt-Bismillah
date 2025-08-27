@@ -534,8 +534,6 @@ nav {
     border-bottom: 1px solid #ddd;
     background-position: center;
     background-size: cover;
-
-    background:linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),url('../img/image.png') no-repeat center center/cover;
     /* transition: background 0.5s ease-in-out; */
 }
 p{
@@ -558,11 +556,9 @@ p{
     align-items: center;
     justify-content: space-between;
     padding: 20px;
-    height: 280px;
+    height: 320px;
     background-color: #f8f8f8;
     border-bottom: 1px solid #ddd;
-
-    background:linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),url('../img/burger.png') no-repeat center center/cover;
 }
 p{
     text-align: center;

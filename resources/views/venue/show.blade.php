@@ -30,11 +30,27 @@ use App\Helpers\FacilityHelper;
 
         {{-- Carousel + Info + Maps --}}
         <div class="md:col-span-2 space-y-4">
+
             {{-- Carousel --}}
             @if ($venue->images && $venue->images->count() > 0)
+                @php
+                    $primary = $venue->images->where('is_primary', 1)->first();
+                    $others = $venue->images->where('is_primary', 0);
+                @endphp
+
                 <div class="swiper rounded-lg overflow-hidden">
                     <div class="swiper-wrapper">
-                        @foreach ($venue->images as $img)
+                        {{-- Primary image dulu --}}
+                        @if ($primary)
+                            <div class="swiper-slide">
+                                <img src="{{ asset('storage/' . $primary->image_url) }}"
+                                     alt="Primary {{ $venue->name }}"
+                                     class="w-full h-72 object-cover" />
+                            </div>
+                        @endif
+
+                        {{-- Gambar lainnya --}}
+                        @foreach ($others as $img)
                             <div class="swiper-slide">
                                 <img src="{{ asset('storage/' . $img->image_url) }}"
                                      alt="{{ $venue->name }}"
@@ -42,6 +58,8 @@ use App\Helpers\FacilityHelper;
                             </div>
                         @endforeach
                     </div>
+
+                    {{-- Navigasi & Pagination --}}
                     <div class="swiper-button-next"></div>
                     <div class="swiper-button-prev"></div>
                     <div class="swiper-pagination"></div>
@@ -78,8 +96,8 @@ use App\Helpers\FacilityHelper;
             </div>
         </div>
 
-        {{-- Fasilitas --}}
-        <div class="bg-white shadow rounded-lg p-4" style="height: 45%; width:115%">
+        {{-- Fasilitas + Booking --}}
+        <div class="bg-white shadow rounded-lg p-4" style="height: 50%; width:115%">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Fasilitas</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-5">
                 @forelse ($venue->facilities as $facility)
@@ -91,16 +109,18 @@ use App\Helpers\FacilityHelper;
                     <p class="text-gray-500">Belum ada fasilitas tersedia.</p>
                 @endforelse
             </div>
+
             {{-- Card Booking --}}
-        <div style="margin-top: 25px">
-            <div class="bg-white shadow rounded-lg p-4">
-                <h2 class="text-xl font-semibold text-gray-800 mb-3">Booking</h2>
-                <p class="text-gray-600 mb-3">Pesan lapangan dengan mudah.</p>
-                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
-                    <a href="{{ route('bookings.create.withVenue', $venue->id) }}" class="btn btn-primary">Booking Sekarang</a>
-                </button>
+            <div style="margin-top: 25px">
+                <div class="bg-white shadow rounded-lg p-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-3">Booking</h2>
+                    <p class="text-gray-600 mb-3">Pesan lapangan dengan mudah.</p>
+                    <a href="{{ route('bookings.create.withVenue', $venue->id) }}"
+                       class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg">
+                        Booking Sekarang
+                    </a>
+                </div>
             </div>
-        </div>
         </div>
     </div>
 </div>
@@ -112,18 +132,22 @@ use App\Helpers\FacilityHelper;
             <h3 class="text-lg font-bold text-white mb-2">QuickCourt</h3>
             <p class="text-sm">Platform booking lapangan olahraga cepat & mudah.</p>
         </div>
-        <div>
-            <h3 class="text-lg font-bold text-white mb-2" style="text-align: center">Kontak</h3>
+        <div style="gap: 5px">
+            <h3 class="text-lg font-bold text-white mb-2 text-center">Kontak</h3>
             <p class="text-sm">📍 {{ $venue->address }}</p>
             <p class="text-sm">📞 0812-3456-7890</p>
             <p class="text-sm">✉️ quickcourt@email.com</p>
         </div>
         <div>
-            <h3 class="text-lg font-bold text-white mb-2" style="text-align: center">Ikuti Kami</h3>
+            <h3 class="text-lg font-bold text-white mb-2 text-center">Ikuti Kami</h3>
             <div class="flex space-x-4">
                 <a href="#" class="hover:text-white">🌐 IG</a>
-                <a href="#" class="hover:text-white">💬 WA</a>
-                <a href="#" class="hover:text-white">🎵 TikTok</a>
+            </div>
+            <div class="flex space-x-4">
+            <a href="#" class="hover:text-white">💬 WA</a>
+            </div>
+            <div class="flex space-x-4">
+            <a href="#" class="hover:text-white">🎵 TikTok</a>
             </div>
         </div>
     </div>
@@ -141,6 +165,5 @@ use App\Helpers\FacilityHelper;
         navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
     });
 </script>
-
 </body>
 </html>

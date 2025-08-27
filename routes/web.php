@@ -47,9 +47,6 @@ Route::post('/test-form-store', function (\Illuminate\Http\Request $request) {
     dd('DATA MASUK', $request->all());
 })->name('test.form.store');
 
-Route::get('/bookings/create/{venueId}', [MemesanController::class, 'create'])
-    ->name('bookings.create');
-
 // Simpan booking
 Route::post('/bookings/store', [MemesanController::class, 'store'])
     ->name('bookings.store');

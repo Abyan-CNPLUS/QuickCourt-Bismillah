@@ -19,7 +19,7 @@ class MemesanController extends Controller
 
         // Jam 08.00 - 22.00
         $times = [];
-        for ($i = 8; $i <= 22; $i++) {
+        for ($i = 8; $i <= 23; $i++) {
             $times[] = sprintf('%02d:00', $i);
         }
 

@@ -29,7 +29,7 @@ class Venues extends Model
 
     public function primaryImage()
     {
-        return $this->hasOne(VenueImage::class, 'venue_id')->where('is_primary', true);
+        return $this->hasOne(VenueImage::class, 'venue_id')->where('is_primary', 1);
     }
 
     public function facilities()

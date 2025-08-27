@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\API\Owner;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Venue;
 use App\Models\Venues;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class OwnerVenueController extends Controller
@@ -31,22 +32,76 @@ class OwnerVenueController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name'        => 'required|string|max:255',
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'capacity' => 'required|integer',
+            'price' => 'required|numeric',
+            'status' => 'required|string',
             'category_id' => 'required|exists:categories,id',
-            'city_id'     => 'required|exists:cities,id',
-            'description' => 'nullable|string',
+            'city_id' => 'required|exists:city,id',
+            'facility_ids' => 'nullable|array',
+            'facility_ids.*' => 'exists:facilities,id',
+            'deskripsi' => 'required|string',
+            'rules' => 'required|string',
+
+
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
+            'image_urls' => 'nullable|array',
+            'image_urls.*' => 'nullable|url',
         ]);
+
 
         $venue = Venues::create([
-            'name'        => $request->name,
-            'category_id' => $request->category_id,
-            'city_id'     => $request->city_id,
-            'description' => $request->description,
-            'user_id'     => Auth::id(),
+            'name' => $validatedData['name'],
+            'address' => $validatedData['address'],
+            'capacity' => $validatedData['capacity'],
+            'price' => $validatedData['price'],
+            'status' => $validatedData['status'],
+            'category_id' => $validatedData['category_id'],
+            'city_id' => $validatedData['city_id'],
+            'deskripsi' => $validatedData['deskripsi'],
+            'rules' => $validatedData['rules'],
+            'user_id' => Auth::user()->id,
         ]);
 
-        return response()->json($venue, 201);
+
+        if (!empty($validatedData['facility_ids'])) {
+            $venue->facilities()->sync($validatedData['facility_ids']);
+        }
+
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $file) {
+                $path = $file->store('venues', 'public');
+                DB::table('venue_images')->insert([
+                    'venue_id' => $venue->id,
+                    'image_url' => $path,
+                    'is_primary' => $index === 0 ? 1 : 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+
+        if (!empty($validatedData['image_urls'])) {
+            foreach ($validatedData['image_urls'] as $index => $url) {
+                DB::table('venue_images')->insert([
+                    'venue_id' => $venue->id,
+                    'image_url' => $url,
+                    'is_primary' => ($request->hasFile('images') ? false : ($index === 0)),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Venue created successfully',
+            'venue' => $venue->load('facilities', 'images', 'city', 'category'),
+        ], 201);
     }
 
 
@@ -94,6 +149,17 @@ class OwnerVenueController extends Controller
         return response()->json([
             'exists' => true,
             'venues' => $venues
+        ]);
+    }
+
+    public function toggleStatus(Request $request, Venues $venue)
+    {
+        $venue->is_closed = !$venue->is_closed;
+        $venue->save();
+
+        return response()->json([
+            'message' => $venue->is_closed ? 'Venue ditutup (libur)' : 'Venue dibuka',
+            'is_closed' => $venue->is_closed
         ]);
     }
 }

@@ -93,7 +93,7 @@
             </td>
             <td style="text-align: left">{{ $menu->name ?? 'N/A' }}</td>
             <td class="text-sm text-center">{{ $menu->description }}</td>
-            <td class="text-sm text-center">Rp {{ number_format($menu->price, 2, ',', '.') }}</td>
+            <td class="text-sm text-center">Rp {{ number_format($menu->price, 0, ',', '.') }}</td>
             <td class="text-sm text-center">
                 <a href="{{ route('menus.edit', $menu->id) }}" class="btn btn-sm btn-warning">Edit</a>
                 <form action="{{ route('menus.destroy', $menu->id) }}" method="POST" style="display:inline-block">

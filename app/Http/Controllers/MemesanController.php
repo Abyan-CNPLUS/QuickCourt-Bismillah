@@ -33,39 +33,39 @@ class MemesanController extends Controller
         return view('booking', compact('venue','dates','times','bookedTimes'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'venue_id' => 'required|exists:venues,id',
-            'booking_date' => 'required|date',
-            'start_time' => 'required',
-            'end_time' => 'required',
-            'total_price' => 'required|numeric',
-            'contact_number' => 'required|string|max:20',
-        ]);
+  public function store(Request $request)
+{
+    $request->validate([
+        'venue_id' => 'required|exists:venues,id',
+        'booking_date' => 'required|date',
+        'start_time' => 'required',
+        'end_time' => 'required',
+        'total_price' => 'required|numeric',
+        'contact_number' => 'required|string|max:20',
+    ]);
 
-        // Simpan booking
-        $booking = Booking::create([
-            'user_id' => Auth::id(),
-            'venue_id' => $request->venue_id,
-            'contact_number' => $request->contact_number,
-            'booking_date' => $request->booking_date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'total_price' => $request->total_price,
-            'status' => 'pending',
-        ]);
+    // Simpan booking
+    $booking = Booking::create([
+        'user_id' => auth()->id(),
+        'venue_id' => $request->venue_id,
+        'contact_number' => $request->contact_number,
+        'booking_date' => $request->booking_date,
+        'start_time' => $request->start_time,
+        'end_time' => $request->end_time,
+        'total_price' => $request->total_price,
+        'status' => 'pending',
+    ]);
 
-        // Buat payment pending
-        Payment::create([
-            'booking_id' => $booking->id,
-            'amount' => $request->total_price,
-            'payment_method' => 'qris',
-            'status' => 'pending',
-            'payment_date' => now(), // tambahkan ini
-        ]);
+    // Buat payment otomatis supaya $booking->payment tidak null
+    Payment::create([
+        'booking_id' => $booking->id,
+        'amount' => $booking->total_price, // langsung dari booking
+        'payment_method' => 'manual', // default sementara
+        'payment_date' => now(),
+        'status' => 'pending',
+    ]);
 
-        // Redirect ke halaman pembayaran
-        return redirect()->route('bookings.payment', $booking->id);
-    }
+    // Redirect ke halaman pilih metode pembayaran
+    return redirect()->route('payments.option', $booking->id);
+}
 }

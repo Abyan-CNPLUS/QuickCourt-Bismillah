@@ -42,6 +42,11 @@ class Venues extends Model
         return $this->hasMany(Fnb_menu::class, 'venue_id');
     }
 
+    public function owner()
+    {
+    return $this->belongsTo(User::class, 'user_id');
+    }
+
 
     public function fnbOrders()
     {

@@ -13,11 +13,14 @@ use App\Http\Controllers\API\BookingController;
 use App\Http\Controllers\API\CategoryController;
 
 use App\Http\Controllers\Api\FnbOrderController;
+use App\Http\Controllers\API\FnbCategoriesController;
 use App\Http\Controllers\Api\OwnerRegisterController;
 use App\Http\Controllers\API\BookingHistoryController;
 use App\Http\Controllers\API\Owner\OwnerVenueController;
 use App\Http\Controllers\API\Owner\BookingOwnerController;
+use App\Http\Controllers\API\Owner\FnbMenuOwnerController;
 use App\Http\Controllers\API\VenueAvailableTimeController;
+use App\Http\Controllers\API\Owner\FnbOrderOwnerController;
 use App\Http\Controllers\API\Owner\OwnerDashboardController;
 use App\Http\Controllers\API\Admin\BookingController as AdminBookingController;
 
@@ -42,9 +45,9 @@ Route::prefix('fnb')->group(function () {
     Route::get('/menu/venue/{venueId}', [FnbController::class, 'getFnbMenuByVenue']);
 });
 
-    Route::get('/fnb-orders', [FnbOrderController::class, 'index']);
-    Route::post('/fnb-orders', [FnbOrderController::class, 'store']);
-    Route::get('/fnb-orders/{id}', [FnbOrderController::class, 'show']);
+Route::get('/fnb-orders', [FnbOrderController::class, 'index']);
+Route::post('/fnb-orders', [FnbOrderController::class, 'store']);
+Route::get('/fnb-orders/{id}', [FnbOrderController::class, 'show']);
 
 
 
@@ -80,12 +83,23 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::put('/owner/bookings/{booking}/status', [BookingOwnerController::class, 'updateStatus']);
     Route::get('/owner/venues/{venueId}/bookings', [BookingOwnerController::class, 'index']);
+
+
+    // Menu buat owner
+    Route::get('/owner/venues/{venueId}/fnb-menus', [FnbMenuOwnerController::class, 'index']);
+    Route::post('/owner/venues/{venueId}/fnb-menus', [FnbMenuOwnerController::class, 'store']);
+    Route::put('/owner/fnb-menus/{menuId}', [FnbMenuOwnerController::class, 'update']);
+    Route::delete('/owner/fnb-menus/{menuId}', [FnbMenuOwnerController::class, 'destroy']);
+
+    // Order Owner
+    Route::get('/owner/venues/{venueId}/fnb-orders', [FnbOrderOwnerController::class, 'index']);
+    Route::put('/owner/fnb-orders/{orderId}/status', [FnbOrderOwnerController::class, 'updateStatus']);
+
+    // FnbCategories
+    Route::get('/fnb-categories', [FnbCategoriesController::class, 'index']);
 });
 
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('admin-booking', AdminBookingController::class);
 });
-
-
-

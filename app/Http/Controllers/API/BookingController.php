@@ -13,13 +13,19 @@ class BookingController extends Controller
     public function index()
     {
         $bookings = Booking::where('user_id', Auth::id())->with('venue')->latest()->get();
-        return view('booking', compact('bookings'));
+        return response()->json([
+            'success' => true,
+            'data' => $bookings,
+        ]);
     }
 
     public function create()
     {
         $venues = Venues::all();
-        return view('booking', compact('venues'));
+        return response()->json([
+            'success' => true,
+            'data' => $venues,
+        ]);
     }
 
     public function store(Request $request)
@@ -51,7 +57,7 @@ class BookingController extends Controller
             ->where(function ($query) use ($request) {
                 $query->where(function ($q) use ($request) {
                     $q->where('start_time', '<', $request->end_time)
-                      ->where('end_time', '>', $request->start_time);
+                        ->where('end_time', '>', $request->start_time);
                 });
             })->exists();
 
@@ -72,7 +78,13 @@ class BookingController extends Controller
             'status' => 'pending',
         ]);
 
-        return redirect()->route('booking.show', $booking->id)->with('success', 'Booking successfully created!');
+
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Booking berhasil dibuat',
+            'data'    => $booking
+        ], 201);
     }
 
     public function show($id)
@@ -83,7 +95,10 @@ class BookingController extends Controller
             abort(404, 'Booking not found');
         }
 
-        return view('booking.show', compact('booking'));
+        return response()->json([
+            'success' => true,
+            'data' => $booking,
+        ]);
     }
 
     public function destroy($id)
@@ -96,6 +111,10 @@ class BookingController extends Controller
 
         $booking->delete();
 
-        return redirect()->route('booking.index')->with('success', 'Booking deleted');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Booking deleted'
+        ]);
     }
 }

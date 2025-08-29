@@ -23,7 +23,7 @@ class Fnb_menu extends Model
 
     public function venue()
     {
-        return $this->belongsTo(Venues::class);
+        return $this->belongsTo(Venues::class, 'venue_id');
     }
 
     public function category()

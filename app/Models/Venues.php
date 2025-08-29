@@ -39,8 +39,13 @@ class Venues extends Model
 
     public function fnbMenus()
     {
-        return $this->hasMany(Fnb_menu::class);
+        return $this->hasMany(Fnb_menu::class, 'venue_id');
     }
 
+
+    public function fnbOrders()
+    {
+        return $this->hasMany(Fnb_order::class, 'venue_id');
+    }
 
 }

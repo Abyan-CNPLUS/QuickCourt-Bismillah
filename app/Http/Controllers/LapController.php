@@ -13,7 +13,10 @@ class LapController extends Controller
     {
         $cities = City::all();
         $categories = Category::all();
-        $venues = Venues::latest('updated_at')->get();
+        $venues = Venues::where('approval_status', 'approved') // hanya yang sudah diapprove admin
+                ->latest('updated_at')
+                ->get();
+
 
         return view('venue.venue', compact('cities', 'categories', 'venues'));
     }
@@ -29,7 +32,8 @@ class LapController extends Controller
 
     public function filter(Request $request)
 {
-    $query = Venues::with(['city', 'category', 'images']);
+    $query = Venues::with(['city', 'category', 'images'])
+                   ->where('approval_status', 'approved'); // filter approval
 
     if ($request->city_id) {
         $query->where('city_id', $request->city_id);
@@ -49,4 +53,5 @@ class LapController extends Controller
 
     return response()->json($query->get());
 }
+
 }

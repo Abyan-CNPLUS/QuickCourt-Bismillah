@@ -18,6 +18,7 @@
 
 <body class="g-sidenav-show bg-gray-100">
     <div class="min-height-300 bg-dark position-absolute w-100"></div>
+      @include('layouts.sidebarowner')
     <main class="main-content position-relative border-radius-lg">
         {{-- Navbar --}}
         <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur">
@@ -85,12 +86,13 @@
                                                 <td class="text-sm text-center">{{ $venue->category->name ?? '-' }}</td>
                                                 <td class="text-sm text-center">{{ $venue->city->name ?? '-' }}</td>
                                                 <td class="text-sm text-center">
-                                                    <span class="badge
-                                                        {{ $venue->status == 'approved' ? 'bg-success' :
-                                                           ($venue->status == 'pending' ? 'bg-warning' : 'bg-danger') }}">
-                                                        {{ ucfirst($venue->status) }}
-                                                    </span>
+                                                            <span class="badge
+                                                            {{ $venue->approval_status == 'approved' ? 'bg-success' :
+                                                            ($venue->approval_status == 'pending' ? 'bg-warning' : 'bg-danger') }}">
+                                                            {{ ucfirst($venue->approval_status) }}
+                                                                </span>
                                                 </td>
+
                                                 <td class="text-center">
                                                     <a href="{{ route('owner.venues.edit', $venue->id) }}" class="btn btn-sm btn-warning">Edit</a>
                                                     <form action="{{ route('owner.venues.destroy', $venue->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?')">

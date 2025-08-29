@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\Venues;
 
 class User extends Authenticatable
 {
@@ -24,7 +22,7 @@ class User extends Authenticatable
         'password',
         'firebase_uid',
         'phone',
-        'role',
+        'role', // penting untuk multi-role auth
     ];
 
     /**
@@ -48,10 +46,28 @@ class User extends Authenticatable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Venues>
+     * Relasi User -> Venues (Owner punya banyak venue)
      */
     public function venues()
     {
-        return $this->hasMany(Venues::class);
+        return $this->hasMany(Venues::class, 'user_id');
+    }
+
+    /**
+     * Helper: cek role user
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isOwner(): bool
+    {
+        return $this->role === 'owner';
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
     }
 }

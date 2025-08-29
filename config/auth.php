@@ -35,17 +35,24 @@ return [
     |
     */
 
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
-
-        'sanctum' => [ 
-            'driver' => 'sanctum',
-            'provider' => 'users',
-        ],
+   'guards' => [
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
     ],
+
+    'owner' => [
+        'driver' => 'session',
+        'provider' => 'users', // pakai tabel users juga
+    ],
+],
+
+'providers' => [
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------
@@ -68,6 +75,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+
+        'owners' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Owner::class,
         ],
 
         // 'users' => [

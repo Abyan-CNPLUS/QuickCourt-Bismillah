@@ -19,15 +19,23 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
+        $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required',
+        ]);
+
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
+            // Setelah login sukses, langsung arahkan sesuai role
             return $this->redirectByRole(Auth::user()->role);
         }
 
-        return back()->with('error', 'Email atau password salah, coba lagi!');
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ]);
     }
 
     public function logout(Request $request)
@@ -45,10 +53,15 @@ class LoginController extends Controller
      */
     protected function redirectByRole($role)
     {
-        if ($role === 'admin') {
-            return redirect()->intended(RouteServiceProvider::ADMIN);
-        }
+        switch ($role) {
+            case 'admin':
+                return redirect()->intended(RouteServiceProvider::ADMIN);
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+            case 'owner':
+                return redirect()->intended(route('owner.dashboard'));
+
+            default:
+                return redirect()->intended(RouteServiceProvider::HOME);
+        }
     }
 }

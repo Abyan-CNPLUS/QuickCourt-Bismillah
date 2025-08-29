@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 
 class PemilikVenueController extends Controller
 {
-    // Tampilkan semua venue milik owner
     public function index()
     {
         $venues = Venues::with(['category', 'city', 'images'])

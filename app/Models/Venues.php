@@ -82,7 +82,7 @@ class Venues extends Model
     // FNB menus
     public function fnbMenus()
     {
-        return $this->hasMany(Fnb_menu::class);
+        return $this->hasMany(Fnb_menu::class, 'venue_id');
     }
 
     /**
@@ -101,4 +101,3 @@ class Venues extends Model
         return $this->images->first()->image_url ?? null;
     }
 }
-  

@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="apple-touch-icon" sizes="100x100" href="../assets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="{{asset('img/logo.png')}}">
-    <title>
-        Venue
-    </title>
+            <link rel="icon" type="image/png" href="{{asset('img/logo.png')}}">
+                <title>FNB | Owner</title>
 </head>
 <body>
 <!DOCTYPE html>
@@ -16,8 +15,6 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
-
     <!--Fonts and icons-->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
     <!-- Nucleo Icons -->
@@ -32,17 +29,17 @@
 </head>
 <body class="g-sidenav-show   bg-gray-100">
     <div class="min-height-300 bg-dark position-absolute w-100"></div>
-    @include('layouts.sidebardash')
+    @include('layouts.sidebarowner')
 
     <main class="main-content position-relative border-radius-lg">
         <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
       <div class="container-fluid py-1 px-3">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
-            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pages</a></li>
-            <li class="breadcrumb-item text-sm text-white active" aria-current="page">venue</li>
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Owner</a></li>
+            <li class="breadcrumb-item text-sm text-white active" aria-current="page">FNB</li>
           </ol>
-          <h6 class="font-weight-bolder text-white mb-0">Venue</h6>
+          <h6 class="font-weight-bolder text-white mb-0">My Food</h6>
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center hidden">
@@ -55,6 +52,8 @@
                 <span class="d-sm-inline d-none">{{Auth::User()->name}}</span>
               </a>
             </li>
+              </ul>
+            </li>
           </ul>
         </div>
       </div>
@@ -65,8 +64,8 @@
             <div class="col-12">
             <div class="card mb-4">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                <h6 >Venue List</h6>
-                 <a href="{{ route('admin.venues.approval') }}" class="btn btn-primary">+ Add</a>
+                <h6 >Food List</h6>
+                 <a href="{{ route('menus.create') }}" class="btn btn-primary">+ Add</a>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                 <div class="table-responsive p-0">
@@ -75,35 +74,29 @@
                     <thead>
                         <tr>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">No</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Image</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Name Venue</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Address</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Food</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Description</th>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Price</th>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Actions</th>
                         </tr>
                     </thead>
     <tbody>
-                 @isset($venues)
-                 @foreach($venues as $venue)
+                 @isset($fnbMenus)
+                 @foreach($fnbMenus as $menu)
         <tr>
             <td class="text-sm text-center">
-                @if(method_exists($venues, 'currentPage'))
-                    {{ ($venues->currentPage() - 1) * $venues->perPage() + $loop->iteration }}
+                @if(method_exists($fnbMenus, 'currentPage'))
+                    {{ ($fnbMenus->currentPage() - 1) * $fnbMenus->perPage() + $loop->iteration }}
                 @else
                     {{ $loop->iteration }}
                 @endif
             </td>
-            <td>
-                @if($venue->images->isNotEmpty())
-                <img src="{{ asset('storage/' . $venue->images->first()->image_url) }}" alt="Venue Image" width="100">
-                @endif
-            </td>
-            <td class="text-sm text-center">{{ $venue->name ?? 'N/A' }}</td>
-            <td class="text-sm text-center">{{ $venue->address ?? 'N/A' }}</td>
-            <td class="text-sm text-center">Rp {{ number_format($venue->price, 0, ',', '.') }}</td>
+            <td style="text-align: left">{{ $menu->name ?? 'N/A' }}</td>
+            <td class="text-sm text-center">{{ $menu->description }}</td>
+            <td class="text-sm text-center">Rp {{ number_format($menu->price, 0, ',', '.') }}</td>
             <td class="text-sm text-center">
-                <a href="{{ route('admin.venues.edit', $venue->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                <form action="{{ route('admin.venues.destroy', $venue->id) }}" method="POST" style="display:inline-block">
+                <a href="{{ route('menus.edit', $menu->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                <form action="{{ route('menus.destroy', $menu->id) }}" method="POST" style="display:inline-block">
                     @csrf
                     @method('DELETE')
                     <button type="submit" onclick="return confirm('Are you sure?')" class="btn btn-sm btn-danger">Delete</button>
@@ -111,40 +104,37 @@
             </td>
         </tr>
         @endforeach
-
-        @if($venues->isEmpty())
+         @if($fnbMenus->isEmpty())
         <tr>
-            <td colspan="5" class="text-center text-muted">No venues found.</td>
+            <td colspan="5" class="text-center text-muted">No menu found.</td>
         </tr>
         @endif
     @else
         <tr>
-            <td colspan="5" class="text-center text-danger">Venues data not available.</td>
+            <td colspan="5" class="text-center text-danger">Data not available.</td>
         </tr>
     @endisset
 </tbody>
 </table>
 </div>
 <div class="pagination-wrapper d-flex flex-column align-items-center gap-3 mt-4 mb-4">
-    {{-- Default pagination links --}}
-   <div class="pagination-wrapper d-flex justify-content-between align-items-center mt-4">
     {{-- Pagination links --}}
     <nav aria-label="Page navigation">
         <ul class="pagination pagination-sm mb-0">
             {{-- Previous Page Link --}}
-            @if ($venues->onFirstPage())
+            @if ($fnbMenus->onFirstPage())
                 <li class="page-item disabled">
                     <span class="page-link">&laquo;</span>
                 </li>
             @else
                 <li class="page-item">
-                    <a class="page-link" href="{{ $venues->previousPageUrl() }}" rel="prev">&laquo;</a>
+                    <a class="page-link" href="{{ $fnbMenus->previousPageUrl() }}" rel="prev">&laquo;</a>
                 </li>
             @endif
 
             {{-- Pagination Elements --}}
-            @foreach ($venues->getUrlRange(1, $venues->lastPage()) as $page => $url)
-                @if ($page == $venues->currentPage())
+            @foreach ($fnbMenus->getUrlRange(1, $fnbMenus->lastPage()) as $page => $url)
+                @if ($page == $fnbMenus->currentPage())
                     <li class="page-item active" aria-current="page">
                         <span class="page-link">{{ $page }}</span>
                     </li>
@@ -156,9 +146,9 @@
             @endforeach
 
             {{-- Next Page Link --}}
-            @if ($venues->hasMorePages())
+            @if ($fnbMenus->hasMorePages())
                 <li class="page-item">
-                    <a class="page-link" href="{{ $venues->nextPageUrl() }}" rel="next">&raquo;</a>
+                    <a class="page-link" href="{{ $fnbMenus->nextPageUrl() }}" rel="next">&raquo;</a>
                 </li>
             @else
                 <li class="page-item disabled">
@@ -173,13 +163,15 @@
 </div>
 </div>
 </div>
+</div>
 </main>
 
 
- <script src="../assets/js/core/popper.min.js"></script>
-<script src="../assets/js/core/bootstrap.min.js"></script>
-<script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
-<script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+
+    <script src="../assets/js/core/popper.min.js"></script>
+    <script src="../assets/js/core/bootstrap.min.js"></script>
+    <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+    <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
     {{-- <script src="../assets/js/plugins/chartjs.min.js"></script> --}}
     <script>
         var ctx1 = document.getElementById("chart-line").getContext("2d");

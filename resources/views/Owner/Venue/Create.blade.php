@@ -95,7 +95,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.venues.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('owner.venues.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             {{-- Venue Name --}}

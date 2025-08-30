@@ -1,24 +1,26 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Venues;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
+use App\Models\VenueImage;
 use App\Models\Facility;
 use App\Models\City;
 use Illuminate\Support\Facades\Auth;
 
 class PemilikVenueController extends Controller
 {
+    // Tampilkan semua venue milik owner
     public function index()
     {
-        $venues = Venues::with(['category', 'city', 'images'])
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->paginate(10);
-
+        $venues = Venues::with(['category','city','images'])
+            ->where('user_id', Auth::id())
+            ->orderBy('created_at','desc')
+            ->paginate(10); // paginate supaya bisa pakai links()
         return view('Owner.venue.index', compact('venues'));
     }
 
@@ -34,31 +36,59 @@ class PemilikVenueController extends Controller
 
     // Simpan venue baru
     public function store(Request $request)
-    {
-        $request->validate([
-            'name'        => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'city_id'     => 'required|exists:cities,id',
-            'description' => 'nullable|string',
-        ]);
+{
+    $validated = $request->validate([
+        'name'         => 'required|string|max:255',
+        'category_id'  => 'required|exists:categories,id',
+        'city_id'      => 'required|exists:city,id',
+        'address'      => 'required|string|max:255',
+        'price'        => 'required|numeric|min:0',
+        'capacity'     => 'required|integer|min:1',
+        'status'       => 'required|in:available,booked',
+        'images'       => 'required|array',
+        'images.*'     => 'image|mimes:jpg,jpeg,png|max:10048',
+        'facilities'   => 'nullable|array',
+        'facilities.*' => 'exists:facilities,id',
+    ]);
 
+    DB::beginTransaction();
+
+    try {
         $venue = Venues::create([
-            'name'        => $request->name,
-            'category_id' => $request->category_id,
-            'city_id'     => $request->city_id,
-            'description' => $request->description,
-            'user_id'     => Auth::id(),
-            'status'      => 'pending',
+            'name'            => $validated['name'],
+            'category_id'     => $validated['category_id'],
+            'city_id'         => $validated['city_id'],
+            'address'         => $validated['address'],
+            'price'           => $validated['price'],
+            'capacity'        => $validated['capacity'],
+            'status'          => $validated['status'],
+            'approval_status' => 'pending', // default pending
+            'user_id'         => Auth::id(), // simpan siapa ownernya
         ]);
 
-        // ✅ kalau ada fasilitas dipilih
-        if ($request->has('facilities')) {
-            $venue->facilities()->sync($request->facilities);
+        // ✅ simpan gambar
+        foreach ($request->file('images') as $index => $image) {
+            $path = $image->store('venues', 'public');
+
+            VenueImage::create([
+                'venue_id'   => $venue->id,
+                'image_url'  => $path,
+                'is_primary' => $index === 0 ? 1 : 0,
+            ]);
         }
 
-        return redirect()->route('Owner.venue.index')
-                         ->with('success', 'Venue berhasil diajukan, tunggu approval admin!');
+        // ✅ kalau ada fasilitas
+        $venue->facilities()->sync($validated['facilities'] ?? []);
+
+        DB::commit();
+
+        return redirect()->route('owner.venues.index')
+            ->with('success', 'Venue berhasil diajukan, tunggu approval admin!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->withErrors(['error' => $e->getMessage()])->withInput();
     }
+}
 
     // Form edit venue
     public function edit(Venues $venue)

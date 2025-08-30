@@ -16,23 +16,25 @@ class RegisController extends Controller
     }
 
 
-    public function adduser(Request $request){
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'phone' => 'required'
-        ]);
+   public function adduser(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|min:6',
+        'phone' => 'required'
+    ]);
 
-        // Simpan user ke database
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-        ]);
+    // Simpan user ke database
+    User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'phone' => $request->phone,
+        'role' => 'user', // ✅ tambahkan ini
+    ]);
 
-        return redirect()->route('login');
-    }
+    return redirect()->route('login');
+}
 
 }

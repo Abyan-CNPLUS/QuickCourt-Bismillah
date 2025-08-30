@@ -10,7 +10,10 @@ use App\Http\Controllers\RegisController;
 use App\Http\Controllers\LapController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PemilikVenueController;
+use App\Http\Controllers\Owner\PemilikVenueController;
+use App\Http\Controllers\Owner\FoodiesPemilikController;
+use App\Http\Controllers\Owner\DashboardPemilikController;
+use App\Http\Controllers\Owner\DashbordPemilikController;
 use App\Http\Controllers\Admin\VenueController as AdminVenueController;
 use App\Http\Controllers\Admin\FNBController as AdminMenusController;
 
@@ -36,14 +39,18 @@ Route::get('/bookings/create/{id}', [MemesanController::class, 'create'])->name(
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/profile', fn() => view('admin.profile'))->name('profile');
     Route::prefix('admin')->group(function () {
-    Route::resource('/venues', AdminVenueController::class)->names('admin.venues');
+
+    // Route khusus approval dulu
+    Route::get('venues/approval', [AdminVenueController::class, 'approvalList'])->name('admin.venues.approval');
+    Route::post('venues/{venue}/approve', [AdminVenueController::class, 'approve'])->name('admin.venues.approve');
+    Route::post('venues/{venue}/reject', [AdminVenueController::class, 'reject'])->name('admin.venues.reject');
+
+    // Baru resource route
+    Route::resource('venues', AdminVenueController::class)->names('admin.venues');
 });
+
     Route::resource('menus',AdminMenusController::class);
     Route::get('/admin/profile', fn() => view('admin.profile'))->name('profile');
-
-    Route::get('/test-form', function () {
-    return view('tesform');
-})->name('test.form');
 
 Route::post('/test-form-store', function (\Illuminate\Http\Request $request) {
     dd('DATA MASUK', $request->all());
@@ -79,4 +86,8 @@ Route::prefix('owner')->middleware(['auth'])->group(function () {
     Route::delete('/venues/{venue}', [PemilikVenueController::class, 'destroy'])->name('owner.venues.destroy');
 });
 
+Route::resource('Foodies',FoodiesPemilikController::class);
 
+Route::middleware(['auth'])->prefix('owner')->group(function () {
+   Route::get('dashboard', [DashbordPemilikController::class, 'index'])->name('owner.dashboard');
+});

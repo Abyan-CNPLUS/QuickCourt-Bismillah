@@ -79,5 +79,4 @@ Route::prefix('owner')->middleware(['auth'])->group(function () {
     Route::delete('/venues/{venue}', [PemilikVenueController::class, 'destroy'])->name('owner.venues.destroy');
 });
 
-Route::get('admin/venues/approval', [VenueController::class, 'approvalList'])
-    ->name('admin.venues.approval');
+

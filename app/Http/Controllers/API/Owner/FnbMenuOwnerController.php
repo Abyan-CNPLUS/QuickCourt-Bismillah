@@ -35,14 +35,15 @@ class FnbMenuOwnerController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|integer|min:0',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|max:10240',
             'categories_id' => 'required|integer|exists:fnb_categories,id',
+
         ]);
 
-        
+
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('fnb_images', 'public');
-            $validated['image'] = $path; 
+            $validated['image'] = $path;
         }
 
         $menu = new Fnb_menu($validated);

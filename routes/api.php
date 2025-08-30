@@ -9,14 +9,17 @@ use App\Http\Controllers\API\HomeController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\CitiesController;
 use App\Http\Controllers\API\VenuesController;
-use App\Http\Controllers\API\BookingController;
-use App\Http\Controllers\API\CategoryController;
 
+use App\Http\Controllers\API\BookingController;
+
+use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\Api\FnbOrderController;
+use App\Http\Controllers\API\VenuePromoController;
 use App\Http\Controllers\API\FnbCategoriesController;
 use App\Http\Controllers\Api\OwnerRegisterController;
 use App\Http\Controllers\API\BookingHistoryController;
 use App\Http\Controllers\API\Owner\OwnerVenueController;
+use App\Http\Controllers\API\Owner\PromoOwnerController;
 use App\Http\Controllers\API\Owner\BookingOwnerController;
 use App\Http\Controllers\API\Owner\FnbMenuOwnerController;
 use App\Http\Controllers\API\VenueAvailableTimeController;
@@ -97,7 +100,20 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // FnbCategories
     Route::get('/fnb-categories', [FnbCategoriesController::class, 'index']);
-});
+
+    //user
+    Route::get('/promos', [VenuePromoController::class, 'index']);
+    Route::post('/promos', [VenuePromoController::class, 'store']);
+    Route::get('/promos/{venuePromo}', [VenuePromoController::class, 'show']);
+    Route::put('/promos/{venuePromo}', [VenuePromoController::class, 'update']);
+    Route::delete('/promos/{venuePromo}', [VenuePromoController::class, 'destroy']);
+
+    //owner
+    Route::get('/owner/venue/{venueId}/promos', [PromoOwnerController::class, 'index']);
+    Route::post('/owner/venue/{venueId}/promos', [PromoOwnerController::class, 'store']);
+    Route::put('/owner/promos/{id}', [PromoOwnerController::class, 'update']);
+    Route::delete('/owner/promos/{id}', [PromoOwnerController::class, 'destroy']);
+}); 
 
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {

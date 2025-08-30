@@ -53,4 +53,9 @@ class Venues extends Model
         return $this->hasMany(Fnb_order::class, 'venue_id');
     }
 
+    public function venuePromos()
+    {
+        return $this->hasMany(VenuePromo::class, 'venue_id');
+    }
+
 }

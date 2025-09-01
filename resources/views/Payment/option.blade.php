@@ -18,8 +18,7 @@
 
                 <div class="card-body p-4">
                     <p class="text-muted mb-4 text-center">
-                        Booking #{{ $booking->id }} | Total:
-                        <strong>Rp {{ number_format($booking->total, 0, ',', '.') }}</strong>
+                        Booking #{{ $booking->id }}
                     </p>
 
                     <form action="{{ route('payments.option.process', $booking->id) }}" method="POST">

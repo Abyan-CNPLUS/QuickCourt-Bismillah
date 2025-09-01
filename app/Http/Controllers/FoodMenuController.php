@@ -62,6 +62,6 @@ public function store(Request $request)
     Fnb_menu::create($data);
 
     // Redirect dengan pesan sukses
-    return redirect()->route('menus.index')->with('success', 'Menu berhasil ditambahkan');
+    return redirect()->route('payments.option.process')->with('success', 'Menu berhasil ditambahkan');
 }
 }

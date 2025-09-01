@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/venues.css') }}">
     <link rel="apple-touch-icon" sizes="100x100" href="{{ asset('assets/img/apple-icon.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <title>Venue</title>
@@ -103,7 +105,46 @@
             <p>Tidak ada venue.</p>
         @endforelse
     </div>
+<footer class="bg-gray-900 text-gray-300 mt-10">
+<div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- Branding -->
+    <div>
+      <h3 class="text-xl font-bold text-white mb-2" style="text-align: center">QuickCourt</h3>
+      <p style="color: #fff">Platform booking lapangan olahraga cepat & mudah.</p>
+    </div>
 
+    <!-- Kontak -->
+    <div class="text-center md:text-left">
+      <h3 class="text-xl font-bold text-white mb-2" style="text-align: center">Kontak</h3>
+      <p style="color: #fff">Quickcourt@gmail.com</p>
+    </div>
+
+    <!-- Sosial Media & Play Store -->
+    <div class="text-center md:text-left">
+      <h3 class="text-xl font-bold text-white mb-2" style="text-align: center">Ikuti Kami</h3>
+      <div class="flex justify-center md:justify-start gap-4 mt-2">
+                    <a href="https://www.instagram.com/quick.court25/?next=%2F" class="hover:text-white transition-colors">🌐 IG: Quick Court</a>
+                </div>
+        <div class="flex justify-center md:justify-start gap-4 mt-2">
+        <a href="#" class="hover:text-white transition-colors">🎵 TikTok</a>
+        </div>
+
+      <!-- Play Store -->
+       <div class="mt-4 flex justify-center md:justify-start gap-4">
+                    <a href="https://play.google.com/store/apps/details?id=com.quickcourt.app" target="_blank">
+                        <img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" alt="Download di Play Store" class="h-12 md:h-15">
+                    </a>
+                    <a href="#">
+                        <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download di App Store" class="h-12 md:h-10">
+                    </a>
+                </div>
+    </div>
+  </div>
+
+  <div class="bg-gray-800 text-center py-4 text-sm mt-6">
+    © {{ date('Y') }} QuickCourt. All rights reserved.
+  </div>
+</footer>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>

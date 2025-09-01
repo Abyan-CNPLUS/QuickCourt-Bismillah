@@ -17,6 +17,7 @@ class Payment extends Model
         'status',
         'reference',       // kalau kamu tambahin di migration
         'payment_channel', // opsional
+        'proof'
     ];
 
     // Relasi ke Booking

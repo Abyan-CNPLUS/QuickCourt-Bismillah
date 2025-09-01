@@ -54,7 +54,7 @@ Route::get('/bookings/create/{id}', [MemesanController::class, 'create'])->name(
 
 Route::post('/test-form-store', function (\Illuminate\Http\Request $request) {
     dd('DATA MASUK', $request->all());
-})->name('test.form.store');
+        })->name('test.form.store');
 
 // Simpan booking
 Route::post('/bookings/store', [MemesanController::class, 'store'])
@@ -64,7 +64,6 @@ Route::post('/bookings/store', [MemesanController::class, 'store'])
 Route::get('/bookings/{booking}/payment-option', [PaymentController::class, 'option'])->name('payments.option');
 Route::post('/bookings/{booking}/payment-option', [PaymentController::class, 'optionProcess'])->name('payments.option.process');
 
-// Kalau gateway (Midtrans)
 Route::get('/payments/{payment}/gateway', [PaymentController::class, 'gateway'])
     ->name('payments.gateway');
 

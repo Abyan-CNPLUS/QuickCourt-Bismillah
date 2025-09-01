@@ -13,12 +13,6 @@ class Venues extends Model
     protected $primaryKey = 'id';
     protected $guarded = [];
 
-    /**
-     * ====================
-     * SCOPES
-     * ====================
-     */
-
     // Scope untuk venue yang sudah di-approve (publik)
     public function scopeApproved($query)
     {
@@ -36,12 +30,6 @@ class Venues extends Model
     {
         return $query->where('approval_status', 'approved');
     }
-
-    /**
-     * ====================
-     * RELASI
-     * ====================
-     */
 
     // Category
     public function category()
@@ -84,12 +72,6 @@ class Venues extends Model
     {
         return $this->hasMany(Fnb_menu::class, 'venue_id');
     }
-
-    /**
-     * ====================
-     * ACCESSORS
-     * ====================
-     */
 
     // Mendapatkan gambar yang ditampilkan di front-end
     public function getDisplayImageAttribute()

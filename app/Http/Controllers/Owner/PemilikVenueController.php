@@ -34,7 +34,6 @@ class PemilikVenueController extends Controller
         return view('Owner.venue.create', compact('categories', 'cities', 'facilities'));
     }
 
-    // Simpan venue baru
     public function store(Request $request)
 {
     $validated = $request->validate([
@@ -131,7 +130,7 @@ class PemilikVenueController extends Controller
         $this->authorizeVenue($venue);
         $venue->delete();
 
-        return redirect()->route('Owner.venue.index')
+        return redirect()->route('owner.venues.index')
                          ->with('success', 'Venue berhasil dihapus!');
     }
 

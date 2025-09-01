@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use App\Models\Venues;
 use App\Models\Booking;
+use App\Models\Payment;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
@@ -31,7 +34,10 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         if (auth()->user()->role === 'guest') {
-            return redirect()->back()->with('error', 'Guest users are not allowed to make bookings.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Guest users are not allowed to make bookings.'
+            ], 403);
         }
 
         $request->validate([
@@ -41,50 +47,66 @@ class BookingController extends Controller
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'total_price' => 'required|numeric',
+            'payment_method' => 'required|string',
         ]);
 
-        $venue = Venues::findOrFail($request->venue_id);
+        return DB::transaction(function () use ($request) {
+            $venue = Venues::findOrFail($request->venue_id);
 
-        if ($request->start_time < $venue->open_time || $request->end_time > $venue->close_time) {
-            return redirect()->back()->withErrors([
-                'time' => 'Booking time must be within venue operating hours (' . $venue->open_time . ' - ' . $venue->close_time . ')',
-            ])->withInput();
-        }
+            if ($request->start_time < $venue->open_time || $request->end_time > $venue->close_time) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Booking time must be within venue operating hours (' . $venue->open_time . ' - ' . $venue->close_time . ')',
+                ], 422);
+            }
 
-        $isBooked = Booking::where('venue_id', $request->venue_id)
-            ->whereDate('booking_date', $request->booking_date)
-            ->where('status', '!=', 'cancelled')
-            ->where(function ($query) use ($request) {
-                $query->where(function ($q) use ($request) {
-                    $q->where('start_time', '<', $request->end_time)
-                        ->where('end_time', '>', $request->start_time);
-                });
-            })->exists();
+            $isBooked = Booking::where('venue_id', $request->venue_id)
+                ->whereDate('booking_date', $request->booking_date)
+                ->where('status', '!=', 'cancelled')
+                ->where(function ($query) use ($request) {
+                    $query->where(function ($q) use ($request) {
+                        $q->where('start_time', '<', $request->end_time)
+                            ->where('end_time', '>', $request->start_time);
+                    });
+                })->exists();
 
-        if ($isBooked) {
-            return redirect()->back()->withErrors([
-                'booking' => 'Venue is already booked in this time',
-            ])->withInput();
-        }
-
-        $booking = Booking::create([
-            'user_id' => Auth::id(),
-            'venue_id' => $request->venue_id,
-            'contact_number' => $request->contact_number,
-            'booking_date' => $request->booking_date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'total_price' => $request->total_price,
-            'status' => 'pending',
-        ]);
+            if ($isBooked) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Venue is already booked in this time',
+                ], 422);
+            }
 
 
+            $booking = Booking::create([
+                'user_id' => Auth::id(),
+                'venue_id' => $request->venue_id,
+                'contact_number' => $request->contact_number,
+                'booking_date' => $request->booking_date,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'total_price' => $request->total_price,
+                'status' => 'pending',
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Booking berhasil dibuat',
-            'data'    => $booking
-        ], 201);
+            
+            $payment = Payment::create([
+                'order_id' => 'ORD-' . strtoupper(Str::random(10)),
+                'booking_id' => $booking->id,
+                'amount' => $request->total_price,
+                'payment_method' => $request->payment_method,
+                'status' => 'pending',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Booking berhasil dibuat, silakan lakukan pembayaran.',
+                'data' => [
+                    'booking' => $booking,
+                    'payment' => $payment,
+                ],
+            ], 201);
+        });
     }
 
     public function show($id)

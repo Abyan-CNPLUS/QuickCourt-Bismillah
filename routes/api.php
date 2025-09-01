@@ -52,7 +52,7 @@ Route::get('/fnb-orders', [FnbOrderController::class, 'index']);
 Route::post('/fnb-orders', [FnbOrderController::class, 'store']);
 Route::get('/fnb-orders/{id}', [FnbOrderController::class, 'show']);
 
-
+Route::get('/promos', [VenuePromoController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -102,7 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/fnb-categories', [FnbCategoriesController::class, 'index']);
 
     //user
-    Route::get('/promos', [VenuePromoController::class, 'index']);
+
     Route::post('/promos', [VenuePromoController::class, 'store']);
     Route::get('/promos/{venuePromo}', [VenuePromoController::class, 'show']);
     Route::put('/promos/{venuePromo}', [VenuePromoController::class, 'update']);
@@ -113,7 +113,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/owner/venue/{venueId}/promos', [PromoOwnerController::class, 'store']);
     Route::put('/owner/promos/{id}', [PromoOwnerController::class, 'update']);
     Route::delete('/owner/promos/{id}', [PromoOwnerController::class, 'destroy']);
-}); 
+});
 
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {

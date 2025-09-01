@@ -138,6 +138,8 @@ class VenuesController extends Controller
             return $img;
         });
 
+        $venue->address = $venue->address ?? 'Alamat tidak tersedia';
+
         return response()->json([
             'message' => 'Venue details',
             'venue' => $venue,

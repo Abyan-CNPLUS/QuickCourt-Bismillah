@@ -10,7 +10,7 @@ use Midtrans\Config;
 
 class PaymentController extends Controller
 {
-    // === PAYMENT OPTION ===
+    
     public function option(Booking $booking)
     {
         // Pastikan booking masih pending

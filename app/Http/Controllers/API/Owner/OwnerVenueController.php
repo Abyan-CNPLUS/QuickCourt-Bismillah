@@ -44,14 +44,13 @@ class OwnerVenueController extends Controller
             'facility_ids.*' => 'exists:facilities,id',
             'deskripsi' => 'required|string',
             'rules' => 'required|string',
-
-
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'latitude' => 'nullable|numeric|between:-90,90',
             'images' => 'nullable|array',
             'images.*' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
             'image_urls' => 'nullable|array',
             'image_urls.*' => 'nullable|url',
         ]);
-
 
         $venue = Venues::create([
             'name' => $validatedData['name'],
@@ -63,14 +62,14 @@ class OwnerVenueController extends Controller
             'city_id' => $validatedData['city_id'],
             'deskripsi' => $validatedData['deskripsi'],
             'rules' => $validatedData['rules'],
+            'longitude' => $validatedData['longitude'] ?? null,
+            'latitude' => $validatedData['latitude'] ?? null,
             'user_id' => Auth::user()->id,
         ]);
-
 
         if (!empty($validatedData['facility_ids'])) {
             $venue->facilities()->sync($validatedData['facility_ids']);
         }
-
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $file) {
@@ -84,7 +83,6 @@ class OwnerVenueController extends Controller
                 ]);
             }
         }
-
 
         if (!empty($validatedData['image_urls'])) {
             foreach ($validatedData['image_urls'] as $index => $url) {
@@ -105,21 +103,72 @@ class OwnerVenueController extends Controller
     }
 
 
+
     public function update(Request $request, Venues $venues)
     {
         $this->authorizeVenue($venues);
 
-        $request->validate([
+        $validatedData = $request->validate([
             'name'        => 'sometimes|string|max:255',
             'category_id' => 'sometimes|exists:categories,id',
-            'city_id'     => 'sometimes|exists:cities,id',
-            'description' => 'nullable|string',
+            'city_id'     => 'sometimes|exists:city,id', // cek nama tabelmu
+            'address'     => 'sometimes|string|max:255',
+            'capacity'    => 'sometimes|integer',
+            'price'       => 'sometimes|numeric',
+            'status'      => 'sometimes|string',
+            'deskripsi'   => 'sometimes|string',
+            'rules'       => 'sometimes|string',
+            'longitude'   => 'nullable|numeric|between:-180,180',
+            'latitude'    => 'nullable|numeric|between:-90,90',
+            'facility_ids' => 'nullable|array',
+            'facility_ids.*' => 'exists:facilities,id',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
+            'image_urls' => 'nullable|array',
+            'image_urls.*' => 'nullable|url',
         ]);
 
-        $venues->update($request->all());
+        // Update data dasar venue
+        $venues->update($validatedData);
 
-        return response()->json($venues);
+        // Update facilities jika ada
+        if (isset($validatedData['facility_ids'])) {
+            $venues->facilities()->sync($validatedData['facility_ids']);
+        }
+
+        // Update images jika ada file baru
+        if ($request->hasFile('images')) {
+            // Bisa kamu tambahkan logic hapus gambar lama dulu kalau perlu
+
+            foreach ($request->file('images') as $index => $file) {
+                $path = $file->store('venues', 'public');
+                DB::table('venue_images')->insert([
+                    'venue_id' => $venues->id,
+                    'image_url' => $path,
+                    'is_primary' => $index === 0 ? 1 : 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        
+        if (!empty($validatedData['image_urls'])) {
+            foreach ($validatedData['image_urls'] as $index => $url) {
+                DB::table('venue_images')->insert([
+                    'venue_id' => $venues->id,
+                    'image_url' => $url,
+                    'is_primary' => ($request->hasFile('images') ? false : ($index === 0)),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        return response()->json($venues->load('facilities', 'images', 'city', 'category'));
     }
+
+
 
 
     public function destroy(Venues $venues)

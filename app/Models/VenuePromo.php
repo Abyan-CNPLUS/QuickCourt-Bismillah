@@ -24,5 +24,15 @@ class VenuePromo extends Model
         return $this->belongsTo(Venues::class);
     }
 
+    public function getImageUrlAttribute($value)
+    {
+        if (!$value) return null;
 
+        // Jika sudah full URL, return langsung
+        if (str_starts_with($value, 'http')) {
+            return $value;
+        }
+
+        return asset('storage/' . $value); // otomatis convert relative path ke full URL
+    }
 }

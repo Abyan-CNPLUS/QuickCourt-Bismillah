@@ -14,28 +14,21 @@ class VenuePromoController extends Controller
         $limit = $request->query('limit', 10);
         $now = now();
 
-        $promos = VenuePromo::where('start_date', '<=', $now)
-            ->where('end_date', '>=', $now)
-            ->orderBy('created_at', 'desc')
+        $promos = VenuePromo::where('end_date', '>=', $now)
+            ->orderBy('start_date', 'asc')
             ->paginate($limit);
-
-
-        $promos->getCollection()->transform(function ($promo) {
-            if ($promo->image_url) {
-                $promo->image_url = asset('storage/' . $promo->image_url);
-            }
-            return $promo;
-        });
 
         return response()->json($promos);
     }
 
+    public function show(VenuePromo $venuePromo)
+    {
+        return response()->json($venuePromo);
+    }
 
-    /**
-     * Store a newly created promo in storage.
-     */
     public function store(Request $request)
     {
+        $request->request->remove('image_url'); // Cegah manual input
         $validated = $request->validate([
             'venue_id'    => 'required|integer',
             'title'       => 'required|string|max:255',
@@ -58,24 +51,10 @@ class VenuePromoController extends Controller
         ], 201);
     }
 
-
-    /**
-     * Display the specified promo.
-     */
-    public function show(VenuePromo $venuePromo)
-    {
-        // Tambahkan base URL juga di show
-        if ($venuePromo->image_url) {
-            $venuePromo->image_url = asset('storage/' . $venuePromo->image_url);
-        }
-        return response()->json($venuePromo);
-    }
-
-    /**
-     * Update the specified promo in storage.
-     */
     public function update(Request $request, VenuePromo $venuePromo)
     {
+        $request->request->remove('image_url'); // Cegah manual input
+
         $validated = $request->validate([
             'venue_id'    => 'sometimes|integer',
             'title'       => 'sometimes|string|max:255',
@@ -92,10 +71,6 @@ class VenuePromoController extends Controller
 
         $venuePromo->update($validated);
 
-        if ($venuePromo->image_url) {
-            $venuePromo->image_url = asset('storage/' . $venuePromo->image_url);
-        }
-
         return response()->json([
             'message' => 'Promo berhasil diperbarui.',
             'data' => $venuePromo
@@ -106,8 +81,6 @@ class VenuePromoController extends Controller
     {
         $venuePromo->delete();
 
-        return response()->json([
-            'message' => 'Promo berhasil dihapus.'
-        ]);
+        return response()->json(['message' => 'Promo berhasil dihapus.']);
     }
 }
